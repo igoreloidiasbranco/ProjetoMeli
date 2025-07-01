@@ -1,9 +1,7 @@
 package br.com.meli.partidas.futebol.entity;
 
 import br.com.meli.partidas.futebol.dto.Sigla;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 
 @Entity
@@ -19,7 +17,7 @@ public class Clube {
     @Enumerated(EnumType.STRING)
     private Sigla sigla;
 
-    @JsonProperty("data_criacao")
+
     LocalDate dataCriacao;
 
     Boolean ativo;
