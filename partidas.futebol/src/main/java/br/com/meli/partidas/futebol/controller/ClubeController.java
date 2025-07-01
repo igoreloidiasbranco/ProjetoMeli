@@ -1,7 +1,11 @@
 package br.com.meli.partidas.futebol.controller;
 
+import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
+import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
-import br.com.meli.partidas.futebol.repository.ClubeRepository;
+import br.com.meli.partidas.futebol.service.ClubeService;
+import br.com.meli.partidas.futebol.utils.Conversao;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,15 +13,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/clubes")
 public class ClubeController {
 
-    final ClubeRepository clubeRepository;
+    final ClubeService clubeService;
 
-    public ClubeController(ClubeRepository clubeRepository) {
-        this.clubeRepository = clubeRepository;
+    public ClubeController(ClubeService clubeService) {
+        this.clubeService = clubeService;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Clube salvarClube(@RequestBody Clube clube) {
-        return clubeRepository.save(clube);
+    public ClubeResponseDTO salvarClube(@RequestBody @Valid ClubeRequestDTO clubeRequestDTO) {
+
+       Clube clube = clubeService.salvarClube(Conversao.dtoToEntity(clubeRequestDTO));
+       return Conversao.entityToDTO(clube);
     }
 }
