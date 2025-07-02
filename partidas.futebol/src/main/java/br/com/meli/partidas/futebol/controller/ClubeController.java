@@ -7,6 +7,7 @@ import br.com.meli.partidas.futebol.service.ClubeService;
 import br.com.meli.partidas.futebol.utils.Conversao;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,10 +21,21 @@ public class ClubeController {
     }
 
     @PostMapping
+    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public ClubeResponseDTO salvarClube(@RequestBody @Valid ClubeRequestDTO clubeRequestDTO) {
 
        Clube clube = clubeService.salvarClube(Conversao.dtoToEntity(clubeRequestDTO));
        return Conversao.entityToDTO(clube);
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    @ResponseStatus(HttpStatus.OK)
+    public ClubeResponseDTO atualizarClube(@PathVariable Long id, @RequestBody @Valid ClubeRequestDTO clubeRequestDTO) {
+        Clube clube = Conversao.dtoToEntity(clubeRequestDTO);
+        clube.setId(id);
+        clube = clubeService.atualizarClube(clube);
+        return Conversao.entityToDTO(clube);
     }
 }

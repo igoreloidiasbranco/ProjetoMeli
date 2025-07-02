@@ -4,5 +4,7 @@ import br.com.meli.partidas.futebol.entity.Clube;
 
 public interface ClubeService {
 
-    public Clube salvarClube(Clube clube);
+    Clube salvarClube(Clube clube);
+
+    Clube atualizarClube(Clube clube);
 }
