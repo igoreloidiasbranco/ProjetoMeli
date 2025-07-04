@@ -23,6 +23,10 @@ public class Clube {
     Boolean ativo;
 
 
+    public void inativar() {
+        this.ativo = false;
+    }
+
     public Long getId() {
         return id;
     }

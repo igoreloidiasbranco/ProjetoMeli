@@ -7,4 +7,6 @@ public interface ClubeService {
     Clube salvarClube(Clube clube);
 
     Clube atualizarClube(Clube clube);
+
+    void inativarClube(Long id);
 }
