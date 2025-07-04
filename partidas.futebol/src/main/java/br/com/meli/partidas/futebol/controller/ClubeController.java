@@ -39,7 +39,7 @@ public class ClubeController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void inativarClube(@PathVariable Long id) {
         clubeService.inativarClube(id);
     }
