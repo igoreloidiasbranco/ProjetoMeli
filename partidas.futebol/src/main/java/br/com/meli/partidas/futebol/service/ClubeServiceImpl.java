@@ -5,6 +5,7 @@ import br.com.meli.partidas.futebol.exception.IdNotFoundException;
 import br.com.meli.partidas.futebol.exception.clube_exception.NomeAndSiglaExistsException;
 import br.com.meli.partidas.futebol.repository.ClubeRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ClubeServiceImpl implements ClubeService {
@@ -16,32 +17,48 @@ public class ClubeServiceImpl implements ClubeService {
     }
 
     @Override
+    @Transactional
     public Clube salvarClube(Clube clube) {
 
-        Boolean existeNomeComSigla = clubeRepository.existsByNomeAndSigla(clube.getNome(), clube.getSigla());
-
-        if(existeNomeComSigla){
-            throw new NomeAndSiglaExistsException("Já existe um clube com esse nome nesta sigla");
-        }
+        isExisteNomeNestaSigla(clube);
 
         return clubeRepository.save(clube);
 
     }
 
     @Override
+    @Transactional
     public Clube atualizarClube(Clube clube) {
 
-        boolean clubeExiste = clubeRepository.existsById(clube.getId());
-        if(! clubeExiste){
-            throw new IdNotFoundException("Id não encontrado");
-        }
-
-        Boolean existeNomeComSigla = clubeRepository.existsByNomeAndSigla(clube.getNome(), clube.getSigla());
-
-        if(existeNomeComSigla){
-            throw new NomeAndSiglaExistsException("Já existe um clube com esse nome nesta sigla");
-        }
-
+        isClubeExiste(clube.getId());
+        isExisteNomeNestaSigla(clube);
         return clubeRepository.save(clube);
     }
+
+    @Override
+    @Transactional
+    public void inativarClube(Long id) {
+
+        isClubeExiste(id);
+        Clube clube = clubeRepository.getReferenceById(id);
+        clube.inativar();
+    }
+
+
+    public void isExisteNomeNestaSigla(Clube clube) {
+
+        Boolean isExisteNomeNestaSigla = clubeRepository.existsByNomeAndSigla(clube.getNome(), clube.getSigla());
+
+        if(isExisteNomeNestaSigla){
+            throw new NomeAndSiglaExistsException("Já existe um clube com esse nome nesta sigla");
+        }
+    }
+
+    public void isClubeExiste(Long id) {
+        boolean isClubeExiste = clubeRepository.existsById(id);
+        if(! isClubeExiste){
+            throw new IdNotFoundException("Id não encontrado");
+        }
+    }
+
 }
