@@ -47,7 +47,7 @@ public class ClubeServiceImpl implements ClubeService {
 
     public void isExisteNomeNestaSigla(Clube clube) {
 
-        Boolean isExisteNomeNestaSigla = clubeRepository.existsByNomeAndSigla(clube.getNome(), clube.getSigla());
+        boolean isExisteNomeNestaSigla = clubeRepository.existsByNomeAndSigla(clube.getNome(), clube.getSigla());
 
         if(isExisteNomeNestaSigla){
             throw new NomeAndSiglaExistsException("Já existe um clube com esse nome nesta sigla");

@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ClubeRepository extends JpaRepository<Clube, Long> {
 
     boolean existsById(Long id);
-    Boolean existsByNomeAndSigla(String nome, Sigla sigla);
+    boolean existsByNomeAndSigla(String nome, Sigla sigla);
 }
