@@ -1,6 +1,9 @@
 package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.entity.Clube;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 public interface ClubeService {
 
@@ -9,4 +12,8 @@ public interface ClubeService {
     Clube atualizarClube(Clube clube);
 
     void inativarClube(Long id);
+
+    Clube buscarClubePorId(Long id);
+
+    Page<Clube> listarClubes(Pageable paginacao);
 }

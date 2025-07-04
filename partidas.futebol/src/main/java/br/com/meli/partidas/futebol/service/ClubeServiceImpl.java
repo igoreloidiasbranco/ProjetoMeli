@@ -4,6 +4,8 @@ import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.exception.IdNotFoundException;
 import br.com.meli.partidas.futebol.exception.clube_exception.NomeAndSiglaExistsException;
 import br.com.meli.partidas.futebol.repository.ClubeRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,17 @@ public class ClubeServiceImpl implements ClubeService {
         isClubeExiste(id);
         Clube clube = clubeRepository.getReferenceById(id);
         clube.inativar();
+    }
+
+    @Override
+    public Clube buscarClubePorId(Long id) {
+        isClubeExiste(id);
+        return clubeRepository.getReferenceById(id);
+    }
+
+    @Override
+    public Page<Clube> listarClubes(Pageable paginacao) {
+        return clubeRepository.findAll(paginacao);
     }
 
 
