@@ -20,7 +20,7 @@ public class Clube {
 
     LocalDate dataCriacao;
 
-    Boolean ativo;
+    boolean ativo;
 
 
     public void inativar() {
@@ -59,11 +59,11 @@ public class Clube {
         this.dataCriacao = dataCriacao;
     }
 
-    public Boolean getAtivo() {
+    public boolean getAtivo() {
         return ativo;
     }
 
-    public void setAtivo(Boolean ativo) {
+    public void setAtivo(boolean ativo) {
         this.ativo = ativo;
     }
 }

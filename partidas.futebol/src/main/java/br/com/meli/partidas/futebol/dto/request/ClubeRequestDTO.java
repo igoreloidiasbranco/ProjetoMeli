@@ -24,7 +24,7 @@ public class ClubeRequestDTO {
     LocalDate dataCriacao;
 
     @NotNull
-    Boolean ativo;
+    boolean ativo;
 
     public String getNome() {
         return nome;
@@ -50,11 +50,11 @@ public class ClubeRequestDTO {
         this.dataCriacao = dataCriacao;
     }
 
-    public Boolean getAtivo() {
+    public boolean getAtivo() {
         return ativo;
     }
 
-    public void setAtivo(Boolean ativo) {
+    public void setAtivo(boolean ativo) {
         this.ativo = ativo;
     }
 }

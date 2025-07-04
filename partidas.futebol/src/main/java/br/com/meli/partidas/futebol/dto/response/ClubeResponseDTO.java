@@ -15,7 +15,7 @@ public class ClubeResponseDTO {
     @JsonProperty("data_criacao")
     LocalDate dataCriacao;
 
-    Boolean ativo;
+    boolean ativo;
 
     public Long getId() {
         return id;
@@ -49,11 +49,11 @@ public class ClubeResponseDTO {
         this.dataCriacao = dataCriacao;
     }
 
-    public Boolean getAtivo() {
+    public boolean getAtivo() {
         return ativo;
     }
 
-    public void setAtivo(Boolean ativo) {
+    public void setAtivo(boolean ativo) {
         this.ativo = ativo;
     }
 }
