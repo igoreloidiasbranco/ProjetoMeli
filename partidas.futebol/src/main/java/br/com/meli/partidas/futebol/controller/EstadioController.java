@@ -1,0 +1,31 @@
+package br.com.meli.partidas.futebol.controller;
+
+import br.com.meli.partidas.futebol.dto.request.EstadioRequestDTO;
+import br.com.meli.partidas.futebol.dto.response.EstadioResponseDTO;
+import br.com.meli.partidas.futebol.entity.Estadio;
+import br.com.meli.partidas.futebol.service.EstadioService;
+import br.com.meli.partidas.futebol.utils.Conversao;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/estadios")
+public class EstadioController {
+
+    private final EstadioService estadioService;
+
+
+    public EstadioController(EstadioService estadioService) {
+        this.estadioService = estadioService;
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public EstadioResponseDTO salvarEstadio(@RequestBody @Valid EstadioRequestDTO estadioRequestDTO) {
+        Estadio estadio = estadioService.salvarEstadio(Conversao.dtoToEntity(estadioRequestDTO));
+        return Conversao.entityToDTO(estadio);
+
+    }
+
+}
