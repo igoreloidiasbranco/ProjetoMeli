@@ -2,7 +2,7 @@ package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.exception.IdNotFoundException;
-import br.com.meli.partidas.futebol.exception.clube_exception.NomeAndSiglaExistsException;
+import br.com.meli.partidas.futebol.exception.NomeAndSiglaExistsException;
 import br.com.meli.partidas.futebol.repository.ClubeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,7 +57,7 @@ public class ClubeServiceImpl implements ClubeService {
         return clubeRepository.findAll(paginacao);
     }
 
-
+    @Override
     public void isExisteNomeNestaSigla(Clube clube) {
 
         boolean isExisteNomeNestaSigla = clubeRepository.existsByNomeAndSigla(clube.getNome(), clube.getSigla());
@@ -67,6 +67,7 @@ public class ClubeServiceImpl implements ClubeService {
         }
     }
 
+    @Override
     public void isClubeExiste(Long id) {
         boolean isClubeExiste = clubeRepository.existsById(id);
         if(! isClubeExiste){
