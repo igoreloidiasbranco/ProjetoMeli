@@ -15,5 +15,9 @@ public interface ClubeService {
 
     Clube buscarClubePorId(Long id);
 
+    void isClubeExiste(Long id);
+
+    void isExisteNomeNestaSigla(Clube clube);
+
     Page<Clube> listarClubes(Pageable paginacao);
 }
