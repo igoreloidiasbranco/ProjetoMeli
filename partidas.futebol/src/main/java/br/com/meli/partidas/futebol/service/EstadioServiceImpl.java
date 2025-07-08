@@ -33,6 +33,12 @@ public class EstadioServiceImpl implements EstadioService{
     }
 
     @Override
+    public Estadio buscarEstadioPorId(Long id) {
+        isEstadioExiste(id);
+        return estadioRepository.getReferenceById(id);
+    }
+
+    @Override
     public void isEstadioExiste(Long id) {
 
         boolean existeEstadio = estadioRepository.existsById(id);

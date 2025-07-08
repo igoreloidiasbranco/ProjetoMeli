@@ -11,4 +11,6 @@ public interface EstadioService {
     Estadio atualizarEstadio(Estadio estadio);
 
     void isEstadioExiste(Long id);
+
+    Estadio buscarEstadioPorId(Long id);
 }

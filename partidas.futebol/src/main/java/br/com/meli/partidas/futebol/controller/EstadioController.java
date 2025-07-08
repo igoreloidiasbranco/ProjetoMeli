@@ -36,4 +36,11 @@ public class EstadioController {
         estadio = estadioService.atualizarEstadio(estadio);
         return Conversao.entityToDTO(estadio);
     }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public EstadioResponseDTO buscarEstadioPorId(@PathVariable Long id) {
+        Estadio estadio = estadioService.buscarEstadioPorId(id);
+        return Conversao.entityToDTO(estadio);
+    }
 }
