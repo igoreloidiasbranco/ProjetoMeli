@@ -4,6 +4,8 @@ import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.exception.IdNotFoundException;
 import br.com.meli.partidas.futebol.exception.NomeExistsException;
 import br.com.meli.partidas.futebol.repository.EstadioRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,6 +38,14 @@ public class EstadioServiceImpl implements EstadioService{
     public Estadio buscarEstadioPorId(Long id) {
         isEstadioExiste(id);
         return estadioRepository.getReferenceById(id);
+    }
+
+    @Override
+    public Page<Estadio> listarEstadios(String nome, Pageable paginacao) {
+        if(nome != null && !nome.isEmpty()){
+            return estadioRepository.findByNome(nome, paginacao);
+        }
+        return estadioRepository.findAll(paginacao);
     }
 
     @Override

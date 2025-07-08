@@ -6,6 +6,9 @@ import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.service.EstadioService;
 import br.com.meli.partidas.futebol.utils.Conversao;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,4 +46,15 @@ public class EstadioController {
         Estadio estadio = estadioService.buscarEstadioPorId(id);
         return Conversao.entityToDTO(estadio);
     }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<EstadioResponseDTO> listarEstadios(
+            @RequestParam(required = false) String nome,
+            @PageableDefault(size = 5, sort = {"nome"}) Pageable paginacao
+    ) {
+        return estadioService.listarEstadios(nome, paginacao)
+                .map(Conversao::entityToDTO);
+    }
+
 }
