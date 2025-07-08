@@ -1,5 +1,6 @@
 package br.com.meli.partidas.futebol.service;
 
+import br.com.meli.partidas.futebol.dto.Sigla;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.exception.IdNotFoundException;
 import br.com.meli.partidas.futebol.exception.NomeAndSiglaExistsException;
@@ -53,7 +54,17 @@ public class ClubeServiceImpl implements ClubeService {
     }
 
     @Override
-    public Page<Clube> listarClubes(Pageable paginacao) {
+    public Page<Clube> listarClubes(String nome, Sigla sigla, Boolean ativo, Pageable paginacao) {
+        if(nome != null && !nome.isEmpty()){
+            return clubeRepository.findByNome(nome, paginacao);
+        }
+        if(sigla != null) {
+            return clubeRepository.findBySigla(sigla, paginacao);
+        }
+        if(ativo != null) {
+            return clubeRepository.findByAtivo(ativo, paginacao);
+        }
+
         return clubeRepository.findAll(paginacao);
     }
 

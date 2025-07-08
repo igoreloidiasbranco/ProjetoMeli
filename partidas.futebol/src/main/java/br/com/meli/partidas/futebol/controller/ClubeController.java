@@ -1,5 +1,6 @@
 package br.com.meli.partidas.futebol.controller;
 
+import br.com.meli.partidas.futebol.dto.Sigla;
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
@@ -58,9 +59,12 @@ public class ClubeController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<ClubeResponseDTO> listarClubes(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Sigla sigla,
+            @RequestParam(required = false) Boolean ativo,
             @PageableDefault(size = 5, sort = {"nome"}) Pageable paginacao) {
 
-        Page<Clube> listaClubes = clubeService.listarClubes(paginacao);
+        Page<Clube> listaClubes = clubeService.listarClubes(nome, sigla, ativo, paginacao);
         Page<ClubeResponseDTO> page = listaClubes.map(clube -> Conversao.entityToDTO(clube));
         return page;
     }
