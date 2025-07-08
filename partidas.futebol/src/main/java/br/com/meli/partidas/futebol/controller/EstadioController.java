@@ -28,4 +28,12 @@ public class EstadioController {
 
     }
 
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public EstadioResponseDTO atualizarEstadio(@PathVariable Long id, @RequestBody @Valid EstadioRequestDTO estadioRequestDTO) {
+        Estadio estadio = Conversao.dtoToEntity(estadioRequestDTO);
+        estadio.setId(id);
+        estadio = estadioService.atualizarEstadio(estadio);
+        return Conversao.entityToDTO(estadio);
+    }
 }
