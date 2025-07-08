@@ -7,4 +7,8 @@ public interface EstadioService {
     Estadio salvarEstadio(Estadio estadio);
 
     void isNomeEstadioExiste(Estadio estadio);
+
+    Estadio atualizarEstadio(Estadio estadio);
+
+    void isEstadioExiste(Long id);
 }
