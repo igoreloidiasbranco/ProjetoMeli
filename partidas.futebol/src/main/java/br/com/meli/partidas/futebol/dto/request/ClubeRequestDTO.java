@@ -21,10 +21,10 @@ public class ClubeRequestDTO {
     @JsonProperty("data_criacao")
     @NotNull
     @PastOrPresent
-    LocalDate dataCriacao;
+    private LocalDate dataCriacao;
 
     @NotNull
-    boolean ativo;
+    private boolean ativo;
 
     public String getNome() {
         return nome;
