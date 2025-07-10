@@ -3,6 +3,7 @@ package br.com.meli.partidas.futebol.entity;
 import br.com.meli.partidas.futebol.dto.Sigla;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "clubes")
@@ -18,9 +19,15 @@ public class Clube {
     private Sigla sigla;
 
 
-    LocalDate dataCriacao;
+    private LocalDate dataCriacao;
 
-    boolean ativo;
+    private boolean ativo;
+
+    @OneToMany(mappedBy = "clubeMandante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Partida> partidasMandante;
+
+    @OneToMany(mappedBy = "clubeVisitante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Partida> partidasVisitante;
 
 
     public void inativar() {
@@ -59,11 +66,27 @@ public class Clube {
         this.dataCriacao = dataCriacao;
     }
 
-    public boolean getAtivo() {
+    public boolean isAtivo() {
         return ativo;
     }
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public List<Partida> getPartidasMandante() {
+        return partidasMandante;
+    }
+
+    public void setPartidasMandante(List<Partida> partidasMandante) {
+        this.partidasMandante = partidasMandante;
+    }
+
+    public List<Partida> getPartidasVisitante() {
+        return partidasVisitante;
+    }
+
+    public void setPartidasVisitante(List<Partida> partidasVisitante) {
+        this.partidasVisitante = partidasVisitante;
     }
 }

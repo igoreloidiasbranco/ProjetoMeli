@@ -3,6 +3,8 @@ package br.com.meli.partidas.futebol.entity;
 import br.com.meli.partidas.futebol.dto.Sigla;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "estadios")
 public class Estadio {
@@ -16,6 +18,9 @@ public class Estadio {
     @Column(length = 2)
     @Enumerated(EnumType.STRING)
     private Sigla sigla;
+
+    @OneToMany(mappedBy = "estadio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Partida> partidas;
 
 
     public Long getId() {
@@ -40,5 +45,13 @@ public class Estadio {
 
     public void setSigla(Sigla sigla) {
         this.sigla = sigla;
+    }
+
+    public List<Partida> getPartidas() {
+        return partidas;
+    }
+
+    public void setPartidas(List<Partida> partidas) {
+        this.partidas = partidas;
     }
 }
