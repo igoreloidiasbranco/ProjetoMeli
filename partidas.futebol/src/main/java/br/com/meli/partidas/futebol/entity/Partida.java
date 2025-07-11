@@ -15,11 +15,11 @@ public class Partida {
 
     @ManyToOne
     @JoinColumn(name = "id_clube_mandante", nullable = false)
-    private Clube clubeMandante;
+    private Clube idClubeMandante;
 
     @ManyToOne
     @JoinColumn(name = "id_clube_visitante", nullable = false)
-    private Clube clubeVisitante;
+    private Clube idClubeVisitante;
 
     private Integer golsMandante;
 
@@ -29,10 +29,9 @@ public class Partida {
 
     @ManyToOne
     @JoinColumn(name = "id_estadio", nullable = false)
-    private Estadio estadio;
+    private Estadio idEstadio;
 
     private LocalDateTime dataHoraPartida;
-
 
 
     public Long getId() {
@@ -43,20 +42,20 @@ public class Partida {
         this.id = id;
     }
 
-    public Clube getClubeMandante() {
-        return clubeMandante;
+    public Clube getIdClubeMandante() {
+        return idClubeMandante;
     }
 
-    public void setClubeMandante(Clube clubeMandante) {
-        this.clubeMandante = clubeMandante;
+    public void setIdClubeMandante(Clube idClubeMandante) {
+        this.idClubeMandante = idClubeMandante;
     }
 
-    public Clube getClubeVisitante() {
-        return clubeVisitante;
+    public Clube getIdClubeVisitante() {
+        return idClubeVisitante;
     }
 
-    public void setClubeVisitante(Clube clubeVisitante) {
-        this.clubeVisitante = clubeVisitante;
+    public void setIdClubeVisitante(Clube idClubeVisitante) {
+        this.idClubeVisitante = idClubeVisitante;
     }
 
     public Integer getGolsMandante() {
@@ -83,12 +82,12 @@ public class Partida {
         this.resultado = resultado;
     }
 
-    public Estadio getEstadio() {
-        return estadio;
+    public Estadio getIdEstadio() {
+        return idEstadio;
     }
 
-    public void setEstadio(Estadio estadio) {
-        this.estadio = estadio;
+    public void setIdEstadio(Estadio idEstadio) {
+        this.idEstadio = idEstadio;
     }
 
     public LocalDateTime getDataHoraPartida() {
