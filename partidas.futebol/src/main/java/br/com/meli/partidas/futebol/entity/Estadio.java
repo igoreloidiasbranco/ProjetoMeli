@@ -19,7 +19,7 @@ public class Estadio {
     @Enumerated(EnumType.STRING)
     private Sigla sigla;
 
-    @OneToMany(mappedBy = "estadio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "idEstadio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Partida> partidas;
 
 
