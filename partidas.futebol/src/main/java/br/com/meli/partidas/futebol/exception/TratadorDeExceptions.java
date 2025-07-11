@@ -4,9 +4,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 @ControllerAdvice
 public class TratadorDeExceptions {
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleBadRequestException(ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
+    }
 
     @ExceptionHandler
     public ResponseEntity<String> handleNomeAndSiglaExistsException(NomeAndSiglaExistsException ex) {
