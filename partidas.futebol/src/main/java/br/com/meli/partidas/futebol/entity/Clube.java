@@ -23,10 +23,10 @@ public class Clube {
 
     private boolean ativo;
 
-    @OneToMany(mappedBy = "clubeMandante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "idClubeMandante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Partida> partidasMandante;
 
-    @OneToMany(mappedBy = "clubeVisitante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "idClubeVisitante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Partida> partidasVisitante;
 
 
