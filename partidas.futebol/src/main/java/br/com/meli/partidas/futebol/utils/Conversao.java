@@ -2,10 +2,13 @@ package br.com.meli.partidas.futebol.utils;
 
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
 import br.com.meli.partidas.futebol.dto.request.EstadioRequestDTO;
+import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
 import br.com.meli.partidas.futebol.dto.response.EstadioResponseDTO;
+import br.com.meli.partidas.futebol.dto.response.PartidaResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
+import br.com.meli.partidas.futebol.entity.Partida;
 import org.springframework.beans.BeanUtils;
 
 public class Conversao {
@@ -37,4 +40,18 @@ public class Conversao {
         return estadioResponseDTO;
     }
 
+    public static Partida dtoToEntity(PartidaRequestDTO partidaRequestDTO) {
+        Partida partida = new Partida();
+        BeanUtils.copyProperties(partidaRequestDTO, partida);
+        return partida;
+    }
+
+    public static PartidaResponseDTO entityToDTO(Partida partida) {
+        PartidaResponseDTO partidaResponseDTO = new PartidaResponseDTO();
+        BeanUtils.copyProperties(partida, partidaResponseDTO);
+        partidaResponseDTO.setIdClubeMandante(partida.getIdClubeMandante().getId());
+        partidaResponseDTO.setIdClubeVisitante(partida.getIdClubeVisitante().getId());
+        partidaResponseDTO.setIdEstadio(partida.getIdEstadio().getId());
+        return partidaResponseDTO;
+    }
 }
