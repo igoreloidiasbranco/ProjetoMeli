@@ -1,17 +1,22 @@
 package br.com.meli.partidas.futebol.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 
 public class PartidaResponseDTO {
 
     private Long id;
 
+    @JsonProperty("id_clube_mandante")
     private Long idClubeMandante;
 
+    @JsonProperty("id_clube_visitante")
     private Long idClubeVisitante;
 
     private String resultado;
 
+    @JsonProperty("id_estadio")
     private Long idEstadio;
 
     private LocalDateTime dataHoraPartida;

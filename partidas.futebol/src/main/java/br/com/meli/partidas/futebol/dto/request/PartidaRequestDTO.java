@@ -34,7 +34,6 @@ public class PartidaRequestDTO {
     private LocalDateTime dataHoraPartida;
 
 
-
     public Long getIdClubeMandante() {
         return idClubeMandante;
     }
