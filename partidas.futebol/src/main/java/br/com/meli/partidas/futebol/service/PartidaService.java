@@ -7,6 +7,8 @@ public interface PartidaService {
 
     void isTimesIguais(PartidaRequestDTO partidaRequestDTO);
     void isGolsNegativos(Integer golsMandante, Integer golsVisitante);
+    void isDataHoraAntesCriacaoClube(PartidaRequestDTO partidaRequestDTO);
+    void isClubesExistem(PartidaRequestDTO partidaRequestDTO);
     Partida criarPartida(PartidaRequestDTO partidaRequestDTO);
     Partida salvarPartida(PartidaRequestDTO partidaRequestDTO);
 
