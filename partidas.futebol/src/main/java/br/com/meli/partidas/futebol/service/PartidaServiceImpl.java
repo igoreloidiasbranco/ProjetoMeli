@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+
 @Service
 public class PartidaServiceImpl implements PartidaService {
 
@@ -27,20 +29,23 @@ public class PartidaServiceImpl implements PartidaService {
 
     @Override
     public Partida salvarPartida(PartidaRequestDTO partidaRequestDTO) {
+        isClubesExistem(partidaRequestDTO);
         isTimesIguais(partidaRequestDTO);
         isGolsNegativos(partidaRequestDTO.getGolsMandante(), partidaRequestDTO.getGolsVisitante());
+        isDataHoraAntesCriacaoClube(partidaRequestDTO);
         Partida partida = criarPartida(partidaRequestDTO);
         return partidaRepository.save(partida);
     }
 
     @Override
     public void isTimesIguais(PartidaRequestDTO partidaRequestDTO) {
-        if(partidaRequestDTO.getIdClubeMandante().equals(partidaRequestDTO.getIdClubeVisitante())){
+        if (partidaRequestDTO.getIdClubeMandante().equals(partidaRequestDTO.getIdClubeVisitante())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Clube mandante e visitante não podem ser iguais");
         }
     }
 
+    @Override
     public void isGolsNegativos(Integer golsMandante, Integer golsVisitante) {
         if (golsMandante < 0 || golsVisitante < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gols não podem ser negativos");
@@ -50,17 +55,14 @@ public class PartidaServiceImpl implements PartidaService {
     @Override
     public Partida criarPartida(PartidaRequestDTO partidaRequestDTO) {
 
-        Partida partida = Conversao.dtoToEntity(partidaRequestDTO);
+        Clube clubeMandante = clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeMandante());
 
-        Clube clubeMandante = clubeRepository.findById(partidaRequestDTO.getIdClubeMandante())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Clube mandante não encontrado"));
-
-        Clube clubeVisitante = clubeRepository.findById(partidaRequestDTO.getIdClubeVisitante())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Clube visitante não encontrado"));
+        Clube clubeVisitante = clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeVisitante());
 
         Estadio estadio = estadioRepository.findById(partidaRequestDTO.getIdEstadio())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Estádio não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estádio não encontrado"));
 
+        Partida partida = Conversao.dtoToEntity(partidaRequestDTO);
         partida.setIdClubeMandante(clubeMandante);
         partida.setIdClubeVisitante(clubeVisitante);
         partida.setIdEstadio(estadio);
@@ -71,5 +73,37 @@ public class PartidaServiceImpl implements PartidaService {
                         + clubeVisitante.getNome());
 
         return partida;
+    }
+
+    @Override
+    public void isDataHoraAntesCriacaoClube(PartidaRequestDTO partidaRequestDTO) {
+        Clube clubeMandante = clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeMandante());
+
+        LocalDate dataPartida = partidaRequestDTO.getDataHoraPartida().toLocalDate();
+
+        if (clubeMandante.getDataCriacao().isAfter(dataPartida)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Data da partida não pode ser anterior à data de criação do clube mandante");
+        }
+
+        Clube clubeVisitante = clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeVisitante());
+
+        if (clubeVisitante.getDataCriacao().isAfter(dataPartida)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Data da partida não pode ser anterior à data de criação do clube visitante");
+        }
+    }
+
+    @Override
+    public void isClubesExistem(PartidaRequestDTO partidaRequestDTO) {
+
+        boolean isClubeExiste = clubeRepository.existsById(partidaRequestDTO.getIdClubeMandante());
+
+        if (!isClubeExiste) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clube mandante não encontrado");
+        }
+
+        isClubeExiste = clubeRepository.existsById(partidaRequestDTO.getIdClubeVisitante());
+        if (!isClubeExiste) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clube visitante não encontrado");
+        }
     }
 }
