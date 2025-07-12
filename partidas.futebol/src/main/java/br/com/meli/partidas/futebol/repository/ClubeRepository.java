@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ClubeRepository extends JpaRepository<Clube, Long> {
 
-    boolean existsById(Long id);
     boolean existsByNomeAndSigla(String nome, Sigla sigla);
     Page<Clube> findByNome(String nome, Pageable paginacao);
     Page<Clube> findBySigla(Sigla sigla, Pageable paginacao);
