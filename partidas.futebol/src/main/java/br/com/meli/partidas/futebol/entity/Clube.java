@@ -66,7 +66,7 @@ public class Clube {
         this.dataCriacao = dataCriacao;
     }
 
-    public boolean isAtivo() {
+    public boolean getAtivo() {
         return ativo;
     }
 
