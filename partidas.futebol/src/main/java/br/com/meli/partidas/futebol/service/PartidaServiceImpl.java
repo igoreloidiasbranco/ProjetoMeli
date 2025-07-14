@@ -11,7 +11,10 @@ import br.com.meli.partidas.futebol.utils.Conversao;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.stream.Stream;
 
 @Service
 public class PartidaServiceImpl implements PartidaService {
@@ -35,6 +38,7 @@ public class PartidaServiceImpl implements PartidaService {
         Clube clubeVisitante = clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeVisitante());
         isDataHoraAntesCriacaoClube(clubeMandante,clubeVisitante, partidaRequestDTO.getDataHoraPartida().toLocalDate());
         isClubesAtivos(clubeMandante, clubeVisitante);
+        isPartidaAposIntervalo(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida());
         Estadio estadio = buscarEstadio(partidaRequestDTO.getIdEstadio());
         Partida partida = Conversao.dtoToEntity(partidaRequestDTO, clubeMandante, clubeVisitante, estadio);
         return partidaRepository.save(partida);
@@ -90,6 +94,21 @@ public class PartidaServiceImpl implements PartidaService {
         else if(clubeVisitante.getAtivo() == false) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Clube visitante não está ativo");
         }
+    }
+
+    private void isPartidaAposIntervalo(Clube clubeMandante, Clube clubeVisitante, LocalDateTime dataHoraPartida) {
+
+        final int HORAS_INTERVALO = 48;
+        boolean existePartidaMenos48h = Stream.concat(
+                        Stream.concat(clubeMandante.getPartidasMandante().stream(), clubeMandante.getPartidasVisitante().stream()),
+                        Stream.concat(clubeVisitante.getPartidasMandante().stream(), clubeVisitante.getPartidasVisitante().stream())
+                )
+                .anyMatch(p -> Duration.between(p.getDataHoraPartida(), dataHoraPartida).toHours() < HORAS_INTERVALO);
+        if(existePartidaMenos48h) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Um dos clubes envolvidos já possue outra partida marcada" +
+                    " com diferença menor do que "+ HORAS_INTERVALO + " horas em relação a esta");
+        }
+
     }
 
 
