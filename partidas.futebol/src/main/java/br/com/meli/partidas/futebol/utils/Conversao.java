@@ -40,9 +40,17 @@ public class Conversao {
         return estadioResponseDTO;
     }
 
-    public static Partida dtoToEntity(PartidaRequestDTO partidaRequestDTO) {
+    public static Partida dtoToEntity(PartidaRequestDTO partidaRequestDTO, Clube clubeMandante, Clube clubeVisitante, Estadio estadio) {
         Partida partida = new Partida();
         BeanUtils.copyProperties(partidaRequestDTO, partida);
+        partida.setIdClubeMandante(clubeMandante);
+        partida.setIdClubeVisitante(clubeVisitante);
+        partida.setIdEstadio(estadio);
+        partida.setResultado(
+                clubeMandante.getNome() + " " + partida.getGolsMandante()
+                        + " x " + partida.getGolsVisitante() + " "
+                        + clubeVisitante.getNome());
+
         return partida;
     }
 
