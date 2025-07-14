@@ -6,6 +6,7 @@ import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.entity.Partida;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface PartidaService {
 
@@ -14,7 +15,9 @@ public interface PartidaService {
     void isGolsPositivos(Integer golsMandante, Integer golsVisitante);
     void isDataHoraAntesCriacaoClube(Clube clubeMandante, Clube clubeVisitante, LocalDate dataHoraPartida);
     void isClubesAtivos(Clube clubeMandante, Clube clubeVisitante);
+    void isPartidaAposIntervalo(Clube clubeMandante, Clube clubeVisitante, LocalDateTime dataHoraPartida);
     Estadio buscarEstadio(Long idEstadio);
+    void isEstadioSemPartida(Estadio estadio, LocalDate dataPartida);
     Partida salvarPartida(PartidaRequestDTO partidaRequestDTO);
 
 }
