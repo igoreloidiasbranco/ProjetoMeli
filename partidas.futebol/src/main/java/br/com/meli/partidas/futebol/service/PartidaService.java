@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 public interface PartidaService {
 
-    Partida validarPartida(PartidaRequestDTO partidaRequestDTO);
+    Partida validarPartida(PartidaRequestDTO partidaRequestDTO, Long id);
     Partida salvarPartida(Partida partida);
     Partida atualizarPartida(Partida partidaEditada);
     void deletarPartida(Long id);
@@ -23,8 +23,8 @@ public interface PartidaService {
     void isGolsPositivos(Integer golsMandante, Integer golsVisitante);
     void isDataHoraAntesCriacaoClube(Clube clubeMandante, Clube clubeVisitante, LocalDate dataHoraPartida);
     void isClubesAtivos(Clube clubeMandante, Clube clubeVisitante);
-    void isPartidaAposIntervalo(Clube clubeMandante, Clube clubeVisitante, LocalDateTime dataHoraPartida);
+    void isPartidaAposIntervalo(Clube clubeMandante, Clube clubeVisitante, LocalDateTime dataHoraPartida, Long idPartidaAtual);
     Estadio buscarEstadio(Long idEstadio);
-    void isEstadioSemPartida(Estadio estadio, LocalDate dataPartida);
+    void isEstadioSemPartida(Estadio estadio, LocalDate dataPartida, Long idPartidaAtual);
     void isPartidaExiste(Long id);
 }

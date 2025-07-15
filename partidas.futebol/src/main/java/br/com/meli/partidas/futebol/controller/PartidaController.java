@@ -25,7 +25,7 @@ public class PartidaController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PartidaResponseDTO salvarPartida(@RequestBody @Valid PartidaRequestDTO partidaRequestDTO) {
-        Partida partida = partidaService.validarPartida(partidaRequestDTO);
+        Partida partida = partidaService.validarPartida(partidaRequestDTO, null);
 
         return Conversao.entityToDTO(partidaService.salvarPartida(partida));
     }
@@ -34,7 +34,7 @@ public class PartidaController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public PartidaResponseDTO atualizarPartida(@PathVariable Long id, @RequestBody @Valid PartidaRequestDTO partidaRequestDTO) {
-        Partida partida = partidaService.validarPartida(partidaRequestDTO);
+        Partida partida = partidaService.validarPartida(partidaRequestDTO, id);
         partida.setId(id);
         Partida partidaEditada = partidaService.atualizarPartida(partida);
         return Conversao.entityToDTO(partidaEditada);

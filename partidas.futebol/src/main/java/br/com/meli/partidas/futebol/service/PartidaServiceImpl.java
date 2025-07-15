@@ -35,7 +35,7 @@ public class PartidaServiceImpl implements PartidaService {
     }
 
     @Override
-    public Partida validarPartida(PartidaRequestDTO partidaRequestDTO) {
+    public Partida validarPartida(PartidaRequestDTO partidaRequestDTO, Long idPartidaAtual) {
         isClubesExistem(partidaRequestDTO);
         isClubesDiferentes(partidaRequestDTO);
         isGolsPositivos(partidaRequestDTO.getGolsMandante(), partidaRequestDTO.getGolsVisitante());
@@ -43,9 +43,9 @@ public class PartidaServiceImpl implements PartidaService {
         Clube clubeVisitante = clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeVisitante());
         isDataHoraAntesCriacaoClube(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida().toLocalDate());
         isClubesAtivos(clubeMandante, clubeVisitante);
-        isPartidaAposIntervalo(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida());
+        isPartidaAposIntervalo(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida(), idPartidaAtual);
         Estadio estadio = buscarEstadio(partidaRequestDTO.getIdEstadio());
-        isEstadioSemPartida(estadio, partidaRequestDTO.getDataHoraPartida().toLocalDate());
+        isEstadioSemPartida(estadio, partidaRequestDTO.getDataHoraPartida().toLocalDate(), idPartidaAtual);
         Partida partida = Conversao.dtoToEntity(partidaRequestDTO, clubeMandante, clubeVisitante, estadio);
         return partida;
     }
@@ -145,7 +145,7 @@ public class PartidaServiceImpl implements PartidaService {
     }
 
     @Override
-    public void isPartidaAposIntervalo(Clube clubeMandante, Clube clubeVisitante, LocalDateTime dataHoraPartida) {
+    public void isPartidaAposIntervalo(Clube clubeMandante, Clube clubeVisitante, LocalDateTime dataHoraPartida, Long idPartidaAtual) {
 
         final int HORAS_INTERVALO = 48;
 
@@ -158,6 +158,9 @@ public class PartidaServiceImpl implements PartidaService {
             partidasGeralMandante.addAll(clubeMandante.getPartidasVisitante());
         }
         for (Partida partida : partidasGeralMandante) {
+            if (partida.getId().equals(idPartidaAtual)) {
+                continue;
+            }
             if (Math.abs(Duration.between(partida.getDataHoraPartida(), dataHoraPartida).toHours()) < HORAS_INTERVALO) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Clube mandante já possue outra partida cadastrada" +
                         " com diferença menor do que " + HORAS_INTERVALO + " horas em relação a esta");
@@ -173,6 +176,9 @@ public class PartidaServiceImpl implements PartidaService {
             partidasGeralVisitante.addAll(clubeVisitante.getPartidasVisitante());
         }
         for (Partida partida : partidasGeralVisitante) {
+            if (partida.getId().equals(idPartidaAtual)) {
+                continue;
+            }
             if (Math.abs(Duration.between(partida.getDataHoraPartida(), dataHoraPartida).toHours()) < HORAS_INTERVALO) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Clube visitante já possue outra partida cadastrada" +
                         " com diferença menor do que " + HORAS_INTERVALO + " horas em relação a esta");
@@ -181,8 +187,9 @@ public class PartidaServiceImpl implements PartidaService {
     }
 
     @Override
-    public void isEstadioSemPartida(Estadio estadio, LocalDate dataPartida) {
+    public void isEstadioSemPartida(Estadio estadio, LocalDate dataPartida, Long idPartidaAtual) {
         boolean existePartidaNoEstadio = estadio.getPartidas().stream()
+                .filter(partida -> !partida.getId().equals(idPartidaAtual))
                 .anyMatch(partida -> partida.getDataHoraPartida().toLocalDate().equals(dataPartida));
         if (existePartidaNoEstadio) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Estádio já possui partida marcada para esta data");
