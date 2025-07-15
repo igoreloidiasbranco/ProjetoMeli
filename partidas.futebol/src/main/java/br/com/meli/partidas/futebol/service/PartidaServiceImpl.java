@@ -17,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 public class PartidaServiceImpl implements PartidaService {
@@ -41,7 +43,7 @@ public class PartidaServiceImpl implements PartidaService {
         Clube clubeVisitante = clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeVisitante());
         isDataHoraAntesCriacaoClube(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida().toLocalDate());
         isClubesAtivos(clubeMandante, clubeVisitante);
-        // isPartidaAposIntervalo(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida());
+        isPartidaAposIntervalo(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida());
         Estadio estadio = buscarEstadio(partidaRequestDTO.getIdEstadio());
         isEstadioSemPartida(estadio, partidaRequestDTO.getDataHoraPartida().toLocalDate());
         Partida partida = Conversao.dtoToEntity(partidaRequestDTO, clubeMandante, clubeVisitante, estadio);
@@ -80,11 +82,11 @@ public class PartidaServiceImpl implements PartidaService {
     @Override
     public Page<Partida> listarPartidas(String nomeClube, String nomeEstadio, Pageable paginacao) {
 
-        if(nomeClube != null && !nomeClube.isEmpty()) {
+        if (nomeClube != null && !nomeClube.isEmpty()) {
             return partidaRepository.listarPartidasPorClube(nomeClube, paginacao);
         }
 
-        if(nomeEstadio != null && !nomeEstadio.isEmpty()) {
+        if (nomeEstadio != null && !nomeEstadio.isEmpty()) {
             return partidaRepository.listarPartidasPorEstadio(nomeEstadio, paginacao);
         }
 
@@ -146,14 +148,35 @@ public class PartidaServiceImpl implements PartidaService {
     public void isPartidaAposIntervalo(Clube clubeMandante, Clube clubeVisitante, LocalDateTime dataHoraPartida) {
 
         final int HORAS_INTERVALO = 48;
-        boolean existePartidaMenos48h = Stream.concat(
-                        Stream.concat(clubeMandante.getPartidasMandante().stream(), clubeMandante.getPartidasVisitante().stream()),
-                        Stream.concat(clubeVisitante.getPartidasMandante().stream(), clubeVisitante.getPartidasVisitante().stream())
-                )
-                .anyMatch(p -> Duration.between(p.getDataHoraPartida(), dataHoraPartida).toHours() < HORAS_INTERVALO);
-        if (existePartidaMenos48h) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Um dos clubes envolvidos já possue outra partida marcada" +
-                    " com diferença menor do que " + HORAS_INTERVALO + " horas em relação a esta");
+
+        List<Partida> partidasGeralMandante = new ArrayList<>();
+
+        if (clubeMandante.getPartidasMandante() != null && !clubeMandante.getPartidasMandante().isEmpty()) {
+            partidasGeralMandante.addAll(clubeMandante.getPartidasMandante());
+        }
+        if (clubeMandante.getPartidasVisitante() != null && !clubeMandante.getPartidasVisitante().isEmpty()) {
+            partidasGeralMandante.addAll(clubeMandante.getPartidasVisitante());
+        }
+        for (Partida partida : partidasGeralMandante) {
+            if (Math.abs(Duration.between(partida.getDataHoraPartida(), dataHoraPartida).toHours()) < HORAS_INTERVALO) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Clube mandante já possue outra partida cadastrada" +
+                        " com diferença menor do que " + HORAS_INTERVALO + " horas em relação a esta");
+            }
+        }
+
+        List<Partida> partidasGeralVisitante = new ArrayList<>();
+
+        if (clubeVisitante.getPartidasMandante() != null && !clubeVisitante.getPartidasMandante().isEmpty()) {
+            partidasGeralVisitante.addAll(clubeVisitante.getPartidasMandante());
+        }
+        if (clubeVisitante.getPartidasVisitante() != null && !clubeVisitante.getPartidasVisitante().isEmpty()) {
+            partidasGeralVisitante.addAll(clubeVisitante.getPartidasVisitante());
+        }
+        for (Partida partida : partidasGeralVisitante) {
+            if (Math.abs(Duration.between(partida.getDataHoraPartida(), dataHoraPartida).toHours()) < HORAS_INTERVALO) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Clube visitante já possue outra partida cadastrada" +
+                        " com diferença menor do que " + HORAS_INTERVALO + " horas em relação a esta");
+            }
         }
     }
 
