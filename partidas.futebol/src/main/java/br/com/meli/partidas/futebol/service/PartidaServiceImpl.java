@@ -8,9 +8,12 @@ import br.com.meli.partidas.futebol.repository.ClubeRepository;
 import br.com.meli.partidas.futebol.repository.EstadioRepository;
 import br.com.meli.partidas.futebol.repository.PartidaRepository;
 import br.com.meli.partidas.futebol.utils.Conversao;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,20 +33,64 @@ public class PartidaServiceImpl implements PartidaService {
     }
 
     @Override
-    public Partida salvarPartida(PartidaRequestDTO partidaRequestDTO) {
+    public Partida validarPartida(PartidaRequestDTO partidaRequestDTO) {
         isClubesExistem(partidaRequestDTO);
         isClubesDiferentes(partidaRequestDTO);
         isGolsPositivos(partidaRequestDTO.getGolsMandante(), partidaRequestDTO.getGolsVisitante());
         Clube clubeMandante = clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeMandante());
         Clube clubeVisitante = clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeVisitante());
-        isDataHoraAntesCriacaoClube(clubeMandante,clubeVisitante, partidaRequestDTO.getDataHoraPartida().toLocalDate());
+        isDataHoraAntesCriacaoClube(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida().toLocalDate());
         isClubesAtivos(clubeMandante, clubeVisitante);
-        isPartidaAposIntervalo(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida());
+        // isPartidaAposIntervalo(clubeMandante, clubeVisitante, partidaRequestDTO.getDataHoraPartida());
         Estadio estadio = buscarEstadio(partidaRequestDTO.getIdEstadio());
         isEstadioSemPartida(estadio, partidaRequestDTO.getDataHoraPartida().toLocalDate());
         Partida partida = Conversao.dtoToEntity(partidaRequestDTO, clubeMandante, clubeVisitante, estadio);
+        return partida;
+    }
+
+    @Override
+    @Transactional
+    public Partida salvarPartida(Partida partida) {
+
         return partidaRepository.save(partida);
     }
+
+    @Override
+    @Transactional
+    public Partida atualizarPartida(Partida partidaEditada) {
+
+        isPartidaExiste(partidaEditada.getId());
+        return partidaRepository.save(partidaEditada);
+    }
+
+    @Override
+    @Transactional
+    public void deletarPartida(Long id) {
+        isPartidaExiste(id);
+        partidaRepository.deleteById(id);
+    }
+
+    @Override
+    public Partida buscarPartidaPorId(Long id) {
+        isPartidaExiste(id);
+        Partida partidaEncontrada = partidaRepository.getReferenceById(id);
+        return partidaEncontrada;
+    }
+
+    @Override
+    public Page<Partida> listarPartidas(String nomeClube, String nomeEstadio, Pageable paginacao) {
+
+        if(nomeClube != null && !nomeClube.isEmpty()) {
+            return partidaRepository.listarPartidasPorClube(nomeClube, paginacao);
+        }
+
+        if(nomeEstadio != null && !nomeEstadio.isEmpty()) {
+            return partidaRepository.listarPartidasPorEstadio(nomeEstadio, paginacao);
+        }
+
+        return partidaRepository.findAll(paginacao);
+    }
+
 
     @Override
     public void isClubesExistem(PartidaRequestDTO partidaRequestDTO) {
@@ -80,8 +127,7 @@ public class PartidaServiceImpl implements PartidaService {
 
         if (clubeMandante.getDataCriacao().isAfter(dataPartida)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Data da partida não pode ser anterior à data de criação do clube mandante");
-        }
-        else if (clubeVisitante.getDataCriacao().isAfter(dataPartida)) {
+        } else if (clubeVisitante.getDataCriacao().isAfter(dataPartida)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Data da partida não pode ser anterior à data de criação do clube visitante");
         }
     }
@@ -89,10 +135,9 @@ public class PartidaServiceImpl implements PartidaService {
     @Override
     public void isClubesAtivos(Clube clubeMandante, Clube clubeVisitante) {
 
-        if(clubeMandante.getAtivo() == false) {
+        if (clubeMandante.getAtivo() == false) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Clube mandante não está ativo");
-        }
-        else if(clubeVisitante.getAtivo() == false) {
+        } else if (clubeVisitante.getAtivo() == false) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Clube visitante não está ativo");
         }
     }
@@ -106,9 +151,9 @@ public class PartidaServiceImpl implements PartidaService {
                         Stream.concat(clubeVisitante.getPartidasMandante().stream(), clubeVisitante.getPartidasVisitante().stream())
                 )
                 .anyMatch(p -> Duration.between(p.getDataHoraPartida(), dataHoraPartida).toHours() < HORAS_INTERVALO);
-        if(existePartidaMenos48h) {
+        if (existePartidaMenos48h) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Um dos clubes envolvidos já possue outra partida marcada" +
-                    " com diferença menor do que "+ HORAS_INTERVALO + " horas em relação a esta");
+                    " com diferença menor do que " + HORAS_INTERVALO + " horas em relação a esta");
         }
     }
 
@@ -127,4 +172,12 @@ public class PartidaServiceImpl implements PartidaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estádio não encontrado"));
     }
 
+
+    @Override
+    public void isPartidaExiste(Long id) {
+        boolean existePartida = partidaRepository.existsById(id);
+        if (!existePartida) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Partida não encontrada");
+        }
+    }
 }
