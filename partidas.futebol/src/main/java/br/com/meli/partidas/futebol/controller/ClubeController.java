@@ -37,10 +37,10 @@ public class ClubeController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ClubeResponseDTO atualizarClube(@PathVariable Long id, @RequestBody @Valid ClubeRequestDTO clubeRequestDTO) {
-        Clube clube = Conversao.dtoToEntity(clubeRequestDTO);
-        clube.setId(id);
-        clube = clubeService.atualizarClube(clube);
-        return Conversao.entityToDTO(clube);
+        Clube clubeEditado = Conversao.dtoToEntity(clubeRequestDTO);
+        clubeEditado.setId(id);
+        clubeEditado = clubeService.atualizarClube(clubeEditado);
+        return Conversao.entityToDTO(clubeEditado);
     }
 
     @DeleteMapping("/{id}")
