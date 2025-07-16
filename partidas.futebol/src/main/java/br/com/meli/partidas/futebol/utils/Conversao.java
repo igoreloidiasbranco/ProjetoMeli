@@ -28,6 +28,14 @@ public class Conversao {
         return clubeResponseDTO;
     }
 
+    public static Clube ClubeEditadoToClubeBanco(Clube clubeEditado, Clube clubeBanco) {
+        clubeBanco.setNome(clubeEditado.getNome());
+        clubeBanco.setSigla(clubeEditado.getSigla());
+        clubeBanco.setDataCriacao(clubeEditado.getDataCriacao());
+        clubeBanco.setAtivo(clubeEditado.getAtivo());
+        return clubeBanco;
+    }
+
     public static Estadio  dtoToEntity(EstadioRequestDTO estadioRequestDTO) {
         Estadio estadio = new Estadio();
         BeanUtils.copyProperties(estadioRequestDTO, estadio);
