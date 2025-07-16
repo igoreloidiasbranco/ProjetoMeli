@@ -21,4 +21,6 @@ public interface ClubeService {
     void isExisteNomeNestaSigla(Clube clube);
 
     Page<Clube> listarClubes(String nome, Sigla sigla, Boolean ativo, Pageable paginacao);
+
+    void isDataCriacaoMenorQueDataPartidas(Clube clube);
 }
