@@ -2,13 +2,19 @@ package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.dto.Sigla;
 import br.com.meli.partidas.futebol.entity.Clube;
+import br.com.meli.partidas.futebol.entity.Partida;
 import br.com.meli.partidas.futebol.exception.IdNotFoundException;
 import br.com.meli.partidas.futebol.exception.NomeAndSiglaExistsException;
 import br.com.meli.partidas.futebol.repository.ClubeRepository;
+import br.com.meli.partidas.futebol.utils.Conversao;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ClubeServiceImpl implements ClubeService {
@@ -31,12 +37,16 @@ public class ClubeServiceImpl implements ClubeService {
 
     @Override
     @Transactional
-    public Clube atualizarClube(Clube clube) {
+    public Clube atualizarClube(Clube clubeEditado) {
 
-        isClubeExiste(clube.getId());
-        isExisteNomeNestaSigla(clube);
-        return clubeRepository.save(clube);
+        isClubeExiste(clubeEditado.getId());
+        Clube clubeBanco = clubeRepository.findById(clubeEditado.getId()).orElseThrow(() -> new IdNotFoundException("Id não encontrado"));
+        clubeBanco = Conversao.ClubeEditadoToClubeBanco(clubeEditado, clubeBanco);
+        isExisteNomeNestaSigla(clubeBanco);
+        isDataCriacaoMenorQueDataPartidas(clubeBanco);
+        return clubeRepository.save(clubeBanco);
     }
+
 
     @Override
     @Transactional
@@ -55,13 +65,13 @@ public class ClubeServiceImpl implements ClubeService {
 
     @Override
     public Page<Clube> listarClubes(String nome, Sigla sigla, Boolean ativo, Pageable paginacao) {
-        if(nome != null && !nome.isEmpty()){
+        if (nome != null && !nome.isEmpty()) {
             return clubeRepository.findByNome(nome, paginacao);
         }
-        if(sigla != null) {
+        if (sigla != null) {
             return clubeRepository.findBySigla(sigla, paginacao);
         }
-        if(ativo != null) {
+        if (ativo != null) {
             return clubeRepository.findByAtivo(ativo, paginacao);
         }
 
@@ -71,9 +81,8 @@ public class ClubeServiceImpl implements ClubeService {
     @Override
     public void isExisteNomeNestaSigla(Clube clube) {
 
-        boolean isExisteNomeNestaSigla = clubeRepository.existsByNomeAndSigla(clube.getNome(), clube.getSigla());
-
-        if(isExisteNomeNestaSigla){
+        Clube existente = clubeRepository.findByNomeAndSigla(clube.getNome(), clube.getSigla());
+        if (existente != null && !existente.getId().equals(clube.getId())) {
             throw new NomeAndSiglaExistsException("Já existe um clube com esse nome nesta sigla");
         }
     }
@@ -81,9 +90,28 @@ public class ClubeServiceImpl implements ClubeService {
     @Override
     public void isClubeExiste(Long id) {
         boolean isClubeExiste = clubeRepository.existsById(id);
-        if(! isClubeExiste){
+        if (!isClubeExiste) {
             throw new IdNotFoundException("Id não encontrado");
         }
     }
 
+    @Override
+    public void isDataCriacaoMenorQueDataPartidas(Clube clube) {
+
+        List<Partida> partidasGeralMandante = new ArrayList<>();
+
+        if (clube.getPartidasMandante() != null && !clube.getPartidasMandante().isEmpty()) {
+            partidasGeralMandante.addAll(clube.getPartidasMandante());
+        }
+        if (clube.getPartidasVisitante() != null && !clube.getPartidasVisitante().isEmpty()) {
+            partidasGeralMandante.addAll(clube.getPartidasVisitante());
+        }
+
+        for (Partida partida : partidasGeralMandante) {
+
+            if (partida.getDataHoraPartida().toLocalDate().isBefore(clube.getDataCriacao())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "A data de criação do clube não pode ser maior que a data das partidas");
+            }
+        }
+    }
 }
