@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @ControllerAdvice
 public class TratadorDeExceptions {
@@ -26,6 +27,11 @@ public class TratadorDeExceptions {
 
     @ExceptionHandler
     public ResponseEntity<String> handleNomeExistsException(NomeExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleConstraintViolationException(SQLIntegrityConstraintViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }
