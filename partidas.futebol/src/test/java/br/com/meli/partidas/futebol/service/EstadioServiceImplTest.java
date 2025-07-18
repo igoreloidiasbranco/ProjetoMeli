@@ -64,6 +64,23 @@ class EstadioServiceImplTest {
         Assertions.assertEquals(estadioAlterado.getSigla(), resultado.getSigla());
     }
 
+    @Test
+    @DisplayName("Dado um id existente, deve retornar o estádio correspondente")
+    void testBuscarEstadioPorId() {
+        Long idExistente = 1L;
+
+        Mockito.when(estadioRepository.existsById(idExistente)).thenReturn(true);
+        Mockito.when(estadioRepository.getReferenceById(idExistente)).thenReturn(estadioSalvoNoBanco());
+        Estadio resultado = estadioService.buscarEstadioPorId(idExistente);
+
+        Assertions.assertNotNull(resultado);
+        Mockito.verify(estadioRepository, Mockito.times(1)).existsById(idExistente);
+        Mockito.verify(estadioRepository, Mockito.times(1)).getReferenceById(idExistente);
+        Assertions.assertEquals(idExistente, resultado.getId());
+        Assertions.assertEquals(estadioSalvoNoBanco().getNome(), resultado.getNome());
+        Assertions.assertEquals(estadioSalvoNoBanco().getSigla(), resultado.getSigla());
+
+    }
 
     private Estadio estadioValido() {
         Estadio estadioValido = new Estadio();
