@@ -26,10 +26,8 @@ class EstadioServiceImplTest {
     @Test
     @DisplayName("Dado um estádio válido, deve salvar o estádio com sucesso")
     void testSalvarEstadio() {
-        Estadio estadioValido = new Estadio();
-        estadioValido.setNome("Nome do Estádio");
-        estadioValido.setSigla(Sigla.SP);
 
+        Estadio estadioValido = estadioValido();
         Estadio estadioSalvoNoBanco = estadioSalvoNoBanco();
 
         Mockito.when(estadioRepository.existsByNome(estadioValido.getNome())).thenReturn(false);
@@ -43,6 +41,35 @@ class EstadioServiceImplTest {
         Assertions.assertEquals(estadioSalvoNoBanco.getNome(), resultado.getNome());
         Assertions.assertEquals(estadioSalvoNoBanco.getSigla(), resultado.getSigla());
 
+    }
+
+    @Test
+    @DisplayName("Dado um estádio válido, deve atualizar o estádio com sucesso")
+    void testAtualizarEstadio() {
+        Estadio estadioSalvoNoBanco  = estadioSalvoNoBanco();
+
+        Estadio estadioAlterado = estadioValido();
+        estadioAlterado.setId(estadioSalvoNoBanco.getId());
+        estadioAlterado.setNome("Nome do Estádio Alterado");
+        estadioAlterado.setSigla(Sigla.RJ);
+
+        Mockito.when(estadioRepository.existsById(estadioAlterado.getId())).thenReturn(true);
+        Mockito.when(estadioRepository.existsByNome(estadioAlterado.getNome())).thenReturn(false);
+        Mockito.when(estadioRepository.save(estadioAlterado)).thenReturn(estadioAlterado);
+
+        Estadio resultado = estadioService.atualizarEstadio(estadioAlterado);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(estadioAlterado.getNome(), resultado.getNome());
+        Assertions.assertEquals(estadioAlterado.getSigla(), resultado.getSigla());
+    }
+
+
+    private Estadio estadioValido() {
+        Estadio estadioValido = new Estadio();
+        estadioValido.setNome("Nome do Estádio");
+        estadioValido.setSigla(Sigla.SP);
+        return estadioValido;
     }
 
     private Estadio estadioSalvoNoBanco() {
