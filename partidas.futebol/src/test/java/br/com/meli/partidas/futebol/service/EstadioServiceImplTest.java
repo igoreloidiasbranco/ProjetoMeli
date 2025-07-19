@@ -9,6 +9,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 
 class EstadioServiceImplTest {
@@ -82,6 +87,25 @@ class EstadioServiceImplTest {
 
     }
 
+    @Test
+    @DisplayName("Deve retornar uma lista de estádios com paginação")
+    void testListarEstadios() {
+        List<Estadio> estadiosSalvosNoBanco = estadiosSalvosNoBanco();
+        Pageable pageable = Mockito.mock(Pageable.class);
+        Page<Estadio> page = new PageImpl<>(estadiosSalvosNoBanco, pageable,estadiosSalvosNoBanco.size());
+
+        Mockito.when(estadioRepository.findAll(pageable)).thenReturn(page);
+        Page<Estadio> resultado = estadioService.listarEstadios(null, pageable);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(estadiosSalvosNoBanco.size(), resultado.getTotalElements());
+        Assertions.assertEquals(2, resultado.getTotalElements());
+        Assertions.assertEquals(1, resultado.getTotalPages());
+        Assertions.assertEquals(resultado.getContent().contains(estadiosSalvosNoBanco.get(0)), true);
+        Assertions.assertEquals(resultado.getContent().contains(estadiosSalvosNoBanco.get(1)), true);
+
+    }
+
     private Estadio estadioValido() {
         Estadio estadioValido = new Estadio();
         estadioValido.setNome("Nome do Estádio");
@@ -97,4 +121,19 @@ class EstadioServiceImplTest {
         return estadio;
     }
 
+
+    private List<Estadio> estadiosSalvosNoBanco() {
+
+        Estadio estadio1 = new Estadio();
+        estadio1.setId(1L);
+        estadio1.setNome("Nome do Estádio");
+        estadio1.setSigla(Sigla.SP);
+
+        Estadio estadio2 = new Estadio();
+        estadio2.setId(2L);
+        estadio2.setNome("Outro Estádio");
+        estadio2.setSigla(Sigla.RJ);
+
+        return List.of(estadio1, estadio2);
+    }
 }
