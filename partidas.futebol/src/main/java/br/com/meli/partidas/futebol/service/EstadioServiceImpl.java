@@ -65,10 +65,4 @@ public class EstadioServiceImpl implements EstadioService{
             throw new NomeExistsException("Já existe um estádio com esse nome");
         }
     }
-
-
-
-
-
-
 }

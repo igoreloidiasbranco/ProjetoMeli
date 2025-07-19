@@ -3,6 +3,8 @@ package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.dto.Sigla;
 import br.com.meli.partidas.futebol.entity.Estadio;
+import br.com.meli.partidas.futebol.exception.IdNotFoundException;
+import br.com.meli.partidas.futebol.exception.NomeExistsException;
 import br.com.meli.partidas.futebol.repository.EstadioRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -122,6 +124,36 @@ class EstadioServiceImplTest {
         Assertions.assertEquals(resultado.getContent().contains(estadiosSalvos.get(0)), true);
         Assertions.assertEquals(resultado.getContent().contains(estadiosSalvos.get(1)), false);
         Assertions.assertEquals("Nome do Estádio", resultado.getContent().get(0).getNome());
+    }
+
+    @Test
+    @DisplayName("Dado um id inexistente, deve lançar uma exceção")
+    void testIsEstadioExiste() {
+
+        Long idInvalido = 100L;
+
+        Mockito.when(estadioRepository.existsById(idInvalido)).thenReturn(false);
+        IdNotFoundException exception = Assertions.assertThrows(
+                IdNotFoundException.class, () -> estadioService.isEstadioExiste(idInvalido));
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals("Id não encontrado", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Dado que já existe um estádio com esse nome, deve lançar uma exceção")
+    void testIsNomeEstadioExiste() {
+        List<Estadio> estadiosSalvos = estadiosSalvosNoBanco();
+        Estadio estadioAlterado = estadiosSalvos.get(0);
+        estadioAlterado.setNome("Outro Estádio");
+        estadioAlterado.setSigla(Sigla.RJ);
+
+        Mockito.when(estadioRepository.existsByNome(estadioAlterado.getNome())).thenReturn(true);
+        NomeExistsException exception = Assertions.assertThrows(
+                NomeExistsException.class, () -> estadioService.isNomeEstadioExiste(estadioAlterado));
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals("Já existe um estádio com esse nome", exception.getMessage());
     }
 
     private Estadio estadioValido() {
