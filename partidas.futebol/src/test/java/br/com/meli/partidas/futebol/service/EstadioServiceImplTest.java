@@ -106,6 +106,24 @@ class EstadioServiceImplTest {
 
     }
 
+    @Test
+    @DisplayName("Deve retornar todos os estádios filtrados por nome com sucesso")
+    void testListarEstadiosPorNome() {
+        List<Estadio> estadiosSalvos = estadiosSalvosNoBanco();
+        Pageable pageable = Mockito.mock(Pageable.class);
+        Page<Estadio> page = new PageImpl<>(List.of(estadiosSalvos.get(0)), pageable, 1);
+
+        Mockito.when(estadioRepository.findByNome(estadiosSalvos.get(0).getNome(), pageable)).thenReturn(page);
+        Page<Estadio> resultado = estadioService.listarEstadios("Nome do Estádio", pageable);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(1, resultado.getTotalElements());
+        Assertions.assertEquals(1, resultado.getTotalPages());
+        Assertions.assertEquals(resultado.getContent().contains(estadiosSalvos.get(0)), true);
+        Assertions.assertEquals(resultado.getContent().contains(estadiosSalvos.get(1)), false);
+        Assertions.assertEquals("Nome do Estádio", resultado.getContent().get(0).getNome());
+    }
+
     private Estadio estadioValido() {
         Estadio estadioValido = new Estadio();
         estadioValido.setNome("Nome do Estádio");
