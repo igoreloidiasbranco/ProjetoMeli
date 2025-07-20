@@ -2,8 +2,10 @@ package br.com.meli.partidas.futebol.utils;
 
 import br.com.meli.partidas.futebol.dto.Sigla;
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
+import br.com.meli.partidas.futebol.dto.request.EstadioRequestDTO;
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
+import br.com.meli.partidas.futebol.dto.response.EstadioResponseDTO;
 import br.com.meli.partidas.futebol.dto.response.PartidaResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
@@ -63,11 +65,32 @@ class ConversaoTest {
     }
 
     @Test
-    void testDtoToEntity() {
+    @DisplayName("Dado um EstadioRequestDTO válido, deve retornar um Estadio sem id")
+    void testDtoToEntityEstadio() {
+        EstadioRequestDTO estadioRequestDTO = new EstadioRequestDTO();
+        estadioRequestDTO.setNome("Nome do Estádio");
+        estadioRequestDTO.setSigla(Sigla.SP);
+
+        Estadio resultado = Conversao.dtoToEntity(estadioRequestDTO);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertNull(resultado.getId());
+        Assertions.assertEquals(estadioRequestDTO.getNome(), resultado.getNome());
+        Assertions.assertEquals(estadioRequestDTO.getSigla(), resultado.getSigla());
+
     }
 
     @Test
+    @DisplayName("Dado um Estadio válido, deve retornar um EstadioResponseDTO")
     void testEntityToDTO() {
+        Estadio estadio = estadio();
+
+        EstadioResponseDTO resultado = Conversao.entityToDTO(estadio);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(estadio.getId(), resultado.getId());
+        Assertions.assertEquals(estadio.getNome(), resultado.getNome());
+        Assertions.assertEquals(estadio.getSigla(), resultado.getSigla());
     }
 
     @Test
