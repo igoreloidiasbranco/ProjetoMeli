@@ -2,12 +2,17 @@ package br.com.meli.partidas.futebol.utils;
 
 import br.com.meli.partidas.futebol.dto.Sigla;
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
+import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
+import br.com.meli.partidas.futebol.dto.response.PartidaResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
+import br.com.meli.partidas.futebol.entity.Estadio;
+import br.com.meli.partidas.futebol.entity.Partida;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 class ConversaoTest {
@@ -66,10 +71,87 @@ class ConversaoTest {
     }
 
     @Test
-    void testDtoToEntity1() {
+    @DisplayName("Dado um PartidaRequestDTO, Clube Mandante, Clube Visitante e Estádio válidos, deve retornar uma Partida sem id")
+    void testDtoToEntityPartida() {
+        PartidaRequestDTO partidaRequestDTO = new PartidaRequestDTO();
+        partidaRequestDTO.setIdClubeMandante(1L);
+        partidaRequestDTO.setIdClubeVisitante(2L);
+        partidaRequestDTO.setGolsMandante(1);
+        partidaRequestDTO.setGolsVisitante(0);
+        partidaRequestDTO.setIdEstadio(1L);
+        partidaRequestDTO.setDataHoraPartida(LocalDateTime.now());
+
+        Clube clubeMandante = clubeMandante();
+        Clube clubeVisitante = clubeVisitante();
+        Estadio estadio = estadio();
+
+        Partida resultado = Conversao.dtoToEntity(partidaRequestDTO, clubeMandante, clubeVisitante, estadio);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertNull(resultado.getId());
+        Assertions.assertEquals(partidaRequestDTO.getIdClubeMandante(), resultado.getIdClubeMandante().getId());
+        Assertions.assertEquals(partidaRequestDTO.getIdClubeVisitante(), resultado.getIdClubeVisitante().getId());
+        Assertions.assertEquals(partidaRequestDTO.getGolsMandante(), resultado.getGolsMandante());
+        Assertions.assertEquals(partidaRequestDTO.getGolsVisitante(), resultado.getGolsVisitante());
+        Assertions.assertEquals("Clube Mandante 1 x 0 Clube Visitante", resultado.getResultado());
+        Assertions.assertEquals(partidaRequestDTO.getIdEstadio(), resultado.getIdEstadio().getId());
+        Assertions.assertEquals(partidaRequestDTO.getDataHoraPartida(), resultado.getDataHoraPartida());
+
     }
 
     @Test
-    void testEntityToDTO1() {
+    @DisplayName("Dado uma Partida válida, deve retornar uma PartidaResponseDTO")
+    void testEntityToDTO_Partida() {
+
+        Partida partida = new Partida();
+        partida.setId(1L);
+        partida.setIdClubeMandante(clubeMandante());
+        partida.setIdClubeVisitante(clubeVisitante());
+        partida.setGolsMandante(1);
+        partida.setGolsVisitante(0);
+        partida.setResultado("Clube Mandante 1 x 0 Clube Visitante");
+        partida.setIdEstadio(estadio());
+
+        PartidaResponseDTO resultado = Conversao.entityToDTO(partida);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(partida.getId(), resultado.getId());
+        Assertions.assertEquals(partida.getIdClubeMandante().getId(), resultado.getIdClubeMandante());
+        Assertions.assertEquals(partida.getIdClubeVisitante().getId(), resultado.getIdClubeVisitante());
+        Assertions.assertEquals(partida.getResultado(), resultado.getResultado());
+        Assertions.assertEquals(partida.getIdEstadio().getId(), resultado.getIdEstadio());
+        Assertions.assertEquals(partida.getDataHoraPartida(), resultado.getDataHoraPartida());
+    }
+
+    private Clube clubeMandante() {
+        Clube clubeMandante = new Clube();
+        clubeMandante.setId(1L);
+        clubeMandante.setNome("Clube Mandante");
+        clubeMandante.setSigla(Sigla.SP);
+        clubeMandante.setDataCriacao(LocalDate.now());
+        clubeMandante.setAtivo(true);
+        clubeMandante.setPartidasMandante(null);
+        clubeMandante.setPartidasVisitante(null);
+        return clubeMandante;
+    }
+
+    private Clube clubeVisitante() {
+        Clube clubeVisitante = new Clube();
+        clubeVisitante.setId(2L);
+        clubeVisitante.setNome("Clube Visitante");
+        clubeVisitante.setSigla(Sigla.RJ);
+        clubeVisitante.setDataCriacao(LocalDate.now());
+        clubeVisitante.setAtivo(true);
+        clubeVisitante.setPartidasMandante(null);
+        clubeVisitante.setPartidasVisitante(null);
+        return clubeVisitante;
+    }
+
+    private Estadio estadio() {
+        Estadio estadio = new Estadio();
+        estadio.setId(1L);
+        estadio.setNome("Nome do Estádio");
+        estadio.setSigla(Sigla.SP);
+        return estadio;
     }
 }
