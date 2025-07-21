@@ -34,6 +34,20 @@ public class Partida {
     private LocalDateTime dataHoraPartida;
 
 
+    public Partida(Long id, Clube idClubeMandante, Clube idClubeVisitante, Integer golsMandante, Integer golsVisitante, String resultado, Estadio idEstadio, LocalDateTime dataHoraPartida) {
+        this.id = id;
+        this.idClubeMandante = idClubeMandante;
+        this.idClubeVisitante = idClubeVisitante;
+        this.golsMandante = golsMandante;
+        this.golsVisitante = golsVisitante;
+        this.resultado = resultado;
+        this.idEstadio = idEstadio;
+        this.dataHoraPartida = dataHoraPartida;
+    }
+
+    public Partida() {
+    }
+
     public Long getId() {
         return id;
     }
