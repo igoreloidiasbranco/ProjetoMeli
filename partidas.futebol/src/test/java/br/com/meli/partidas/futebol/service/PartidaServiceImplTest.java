@@ -1,0 +1,189 @@
+package br.com.meli.partidas.futebol.service;
+
+import br.com.meli.partidas.futebol.dto.Sigla;
+import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
+import br.com.meli.partidas.futebol.entity.Clube;
+import br.com.meli.partidas.futebol.entity.Estadio;
+import br.com.meli.partidas.futebol.repository.ClubeRepository;
+import br.com.meli.partidas.futebol.repository.EstadioRepository;
+import br.com.meli.partidas.futebol.repository.PartidaRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+
+class PartidaServiceImplTest {
+
+    private PartidaService partidaService;
+    private PartidaRepository partidaRepository;
+    private ClubeRepository clubeRepository;
+    private EstadioRepository estadioRepository;
+
+
+    @BeforeEach
+    void setUp() {
+        clubeRepository = Mockito.mock(ClubeRepository.class);
+        estadioRepository = Mockito.mock(EstadioRepository.class);
+        partidaRepository = Mockito.mock(PartidaRepository.class);
+        partidaService = new PartidaServiceImpl(partidaRepository, clubeRepository, estadioRepository);
+    }
+
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com clube mandante que não existe, deve lançar uma exceção")
+    void testIsClubesExistemComClubeMandanteInexistente() {
+        PartidaRequestDTO partidaRequestDTO = partidaRequestDTO();
+        partidaRequestDTO.setIdClubeMandante(3L);
+
+        Mockito.when(clubeRepository.existsById(partidaRequestDTO.getIdClubeMandante())).thenReturn(false);
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isClubesExistem(partidaRequestDTO);
+        });
+
+        Assertions.assertNotNull(exception);
+        Mockito.verify(clubeRepository, Mockito.times(1)).existsById(partidaRequestDTO.getIdClubeMandante());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        Assertions.assertEquals("Clube mandante não encontrado", exception.getReason());
+    }
+
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com clube visitante que não existe, deve lançar uma exceção")
+    void testIsClubesExistemComClubeVisitanteInexistente() {
+        PartidaRequestDTO partidaRequestDTO = partidaRequestDTO();
+        partidaRequestDTO.setIdClubeVisitante(3L);
+
+        Mockito.when(clubeRepository.existsById(partidaRequestDTO.getIdClubeMandante())).thenReturn(true);
+        Mockito.when(clubeRepository.existsById(partidaRequestDTO.getIdClubeVisitante())).thenReturn(false);
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isClubesExistem(partidaRequestDTO);
+        });
+
+        Assertions.assertNotNull(exception);
+        Mockito.verify(clubeRepository, Mockito.times(1)).existsById(partidaRequestDTO.getIdClubeMandante());
+        Mockito.verify(clubeRepository, Mockito.times(1)).existsById(partidaRequestDTO.getIdClubeVisitante());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        Assertions.assertEquals("Clube visitante não encontrado", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com Ids de clube mandante e visitante iguais, deve lançar uma exceção")
+    void testIsClubesIguais() {
+
+        PartidaRequestDTO partidaComTimesIguais = partidaRequestDTO();
+        partidaComTimesIguais.setIdClubeMandante(1L);
+        partidaComTimesIguais.setIdClubeVisitante(1L);
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isClubesDiferentes(partidaComTimesIguais);
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        Assertions.assertEquals("Clube mandante e visitante não podem ser iguais", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com Ids de clube mandante e visitante diferentes, não deve lançar uma exceção")
+    void testIsClubesDiferentes() {
+
+        PartidaRequestDTO partidaComTimesDiferentes = partidaRequestDTO();
+
+        Assertions.assertDoesNotThrow(() -> {
+            partidaService.isClubesDiferentes(partidaComTimesDiferentes);
+        });
+    }
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com gols negativo do clube mandante, deve lançar uma exceção")
+    void testIsGolsNegativosClubeMandante() {
+        PartidaRequestDTO partidaComGolsNegativosMandante = partidaRequestDTO();
+        partidaComGolsNegativosMandante.setGolsMandante(-1);
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isGolsPositivos(partidaComGolsNegativosMandante.getGolsMandante(), partidaComGolsNegativosMandante.getGolsVisitante());
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        Assertions.assertEquals("Gols não podem ser negativos", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com gols negativo do clube visitante, deve lançar uma exceção")
+    void testIsGolsNegativosClubeVisitante() {
+        PartidaRequestDTO partidaComGolsNegativosVisitante = partidaRequestDTO();
+        partidaComGolsNegativosVisitante.setGolsVisitante(-1);
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isGolsPositivos(partidaComGolsNegativosVisitante.getGolsMandante(), partidaComGolsNegativosVisitante.getGolsVisitante());
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        Assertions.assertEquals("Gols não podem ser negativos", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com gols positivos, não deve lançar uma exceção")
+    void testIsGolsPositivos() {
+        PartidaRequestDTO partidaComGolsPositivos = partidaRequestDTO();
+
+        Assertions.assertDoesNotThrow(() -> {
+            partidaService.isGolsPositivos(partidaComGolsPositivos.getGolsMandante(), partidaComGolsPositivos.getGolsVisitante());
+        });
+    }
+
+    private PartidaRequestDTO partidaRequestDTO() {
+        PartidaRequestDTO partidaRequestDTO = new PartidaRequestDTO();
+        partidaRequestDTO.setIdClubeMandante(1L);
+        partidaRequestDTO.setIdClubeVisitante(2L);
+        partidaRequestDTO.setGolsMandante(1);
+        partidaRequestDTO.setGolsVisitante(0);
+        partidaRequestDTO.setIdEstadio(1L);
+        partidaRequestDTO.setDataHoraPartida(LocalDateTime.now());
+        return partidaRequestDTO;
+    }
+
+    private Clube clubeMandante() {
+        Clube clubeMandante = new Clube();
+        clubeMandante.setId(1L);
+        clubeMandante.setNome("Clube Mandante");
+        clubeMandante.setSigla(Sigla.SP);
+        clubeMandante.setDataCriacao(LocalDate.now());
+        clubeMandante.setAtivo(true);
+        clubeMandante.setPartidasMandante(null);
+        clubeMandante.setPartidasVisitante(null);
+        return clubeMandante;
+    }
+
+    private Clube clubeVisitante() {
+        Clube clubeVisitante = new Clube();
+        clubeVisitante.setId(2L);
+        clubeVisitante.setNome("Clube Visitante");
+        clubeVisitante.setSigla(Sigla.RJ);
+        clubeVisitante.setDataCriacao(LocalDate.now());
+        clubeVisitante.setAtivo(true);
+        clubeVisitante.setPartidasMandante(null);
+        clubeVisitante.setPartidasVisitante(null);
+        return clubeVisitante;
+    }
+
+    private Estadio estadio() {
+        Estadio estadio = new Estadio();
+        estadio.setId(1L);
+        estadio.setNome("Nome do Estádio");
+        estadio.setSigla(Sigla.SP);
+        return estadio;
+    }
+
+}
