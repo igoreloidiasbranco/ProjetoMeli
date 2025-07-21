@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 class PartidaServiceImplTest {
@@ -328,6 +329,24 @@ class PartidaServiceImplTest {
         Assertions.assertNotNull(exception);
         Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
         Assertions.assertEquals("Estádio já possui partida marcada para esta data", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se o estádio não existir")
+    void testIsEstadioNaoExistente() {
+        Estadio estadio = estadio();
+        estadio.setId(999L);
+
+        Mockito.when(estadioRepository.findById(estadio.getId())).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.buscarEstadio(estadio.getId());
+        });
+
+        Assertions.assertNotNull(exception);
+        Mockito.verify(estadioRepository, Mockito.times(1)).findById(estadio.getId());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        Assertions.assertEquals("Estádio não encontrado", exception.getReason());
     }
 
     private PartidaRequestDTO partidaRequestDTO() {
