@@ -175,6 +175,60 @@ class PartidaServiceImplTest {
         Assertions.assertEquals("Data da partida não pode ser anterior à data de criação do clube visitante", exception.getReason());
     }
 
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com data de partida válida, não deve lançar uma exceção")
+    void testIsDataHoraPartidaValida() {
+        Clube clubeMandante = clubeMandante();
+        Clube clubeVisitante = clubeVisitante();
+        LocalDate dataPartida = LocalDate.now().plusDays(1);
+
+        Assertions.assertDoesNotThrow(() -> {
+            partidaService.isDataHoraAntesCriacaoClube(clubeMandante, clubeVisitante, dataPartida);
+        });
+    }
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com clube mandante inativo, deve lançar uma exceção")
+    void testIsClubesAtivosComClubeMandanteInativo() {
+        Clube clubeMandante = clubeMandante();
+        clubeMandante.setAtivo(false);
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isClubesAtivos(clubeMandante, clubeVisitante());
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        Assertions.assertEquals("Clube mandante não está ativo", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com clube visitante inativo, deve lançar uma exceção")
+    void testIsClubesAtivosComClubeVisitanteInativo() {
+        Clube clubeVisitante = clubeMandante();
+        clubeVisitante.setAtivo(false);
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isClubesAtivos(clubeMandante(), clubeVisitante);
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        Assertions.assertEquals("Clube visitante não está ativo", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com clubes ativos, não deve lançar uma exceção")
+    void testIsClubesAtivos() {
+        Clube clubeMandante = clubeMandante();
+        Clube clubeVisitante = clubeVisitante();
+
+        Assertions.assertDoesNotThrow(() -> {
+            partidaService.isClubesAtivos(clubeMandante, clubeVisitante);
+        });
+    }
+
+
     private PartidaRequestDTO partidaRequestDTO() {
         PartidaRequestDTO partidaRequestDTO = new PartidaRequestDTO();
         partidaRequestDTO.setIdClubeMandante(1L);
