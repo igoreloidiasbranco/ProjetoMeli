@@ -4,6 +4,7 @@ import br.com.meli.partidas.futebol.dto.Sigla;
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
+import br.com.meli.partidas.futebol.entity.Partida;
 import br.com.meli.partidas.futebol.repository.ClubeRepository;
 import br.com.meli.partidas.futebol.repository.EstadioRepository;
 import br.com.meli.partidas.futebol.repository.PartidaRepository;
@@ -14,9 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 class PartidaServiceImplTest {
@@ -228,6 +229,89 @@ class PartidaServiceImplTest {
         });
     }
 
+    @Test
+    @DisplayName("Dado um clube mandante com partida como mandante marcada menor que 48 horas de diferença, deve lançar uma exceção")
+    void testIsClubeMandanteComPartidaComoMandanteMenorQue48HorasDiferenca() {
+        Clube clubeMandante = clubeMandante();
+        clubeMandante.setPartidasMandante(List.of(new Partida(1L, clubeMandante, clubeVisitante(), 1, 0, "1x0", estadio(), LocalDateTime.now())));
+        clubeMandante.setPartidasVisitante(List.of());
+        Clube clubeVisitante = clubeVisitante();
+        clubeVisitante.setPartidasMandante(List.of());
+        clubeVisitante.setPartidasVisitante(List.of());
+        LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
+        Long idPartidaAtual = null; // Simulando que é uma nova partida
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isPartidaAposIntervalo(clubeMandante, clubeVisitante, dataHoraPartida, idPartidaAtual);
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        Assertions.assertEquals("Clube mandante já possue outra partida cadastrada com diferença menor do que 48 horas em relação a esta", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um clube mandante com partida como visitante marcada menor que 48 horas de diferença, deve lançar uma exceção")
+    void testIsClubeMandanteComPartidaComoVisitanteMenorQue48HorasDiferenca() {
+        Clube clubeMandante = clubeMandante();
+        clubeMandante.setPartidasMandante(List.of());
+        clubeMandante.setPartidasVisitante(List.of(new Partida(1L, clubeMandante, clubeVisitante(), 1, 0, "1x0", estadio(), LocalDateTime.now())));
+        Clube clubeVisitante = clubeVisitante();
+        clubeVisitante.setPartidasMandante(List.of());
+        clubeVisitante.setPartidasVisitante(List.of());
+        LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
+        Long idPartidaAtual = null; // Simulando que é uma nova partida
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isPartidaAposIntervalo(clubeMandante, clubeVisitante, dataHoraPartida, idPartidaAtual);
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        Assertions.assertEquals("Clube mandante já possue outra partida cadastrada com diferença menor do que 48 horas em relação a esta", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um clube visitante com partida marcada menor que 48 horas de diferença, deve lançar uma exceção")
+    void testIsClubeVisitanteComPartidaComoMandanteMenorQue48HorasDiferenca() {
+        Clube clubeMandante = clubeMandante();
+        clubeMandante.setPartidasMandante(List.of());
+        clubeMandante.setPartidasVisitante(List.of());
+        Clube clubeVisitante = clubeVisitante();
+        clubeVisitante.setPartidasMandante(List.of(new Partida(1L, clubeMandante, clubeVisitante, 1, 0, "1x0", estadio(), LocalDateTime.now())));
+        clubeVisitante.setPartidasVisitante(List.of());
+        LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
+        Long idPartidaAtual = null; // Simulando que é uma nova partida
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isPartidaAposIntervalo(clubeMandante, clubeVisitante, dataHoraPartida, idPartidaAtual);
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        Assertions.assertEquals("Clube visitante já possue outra partida cadastrada com diferença menor do que 48 horas em relação a esta", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um clube visitante com partida marcada menor que 48 horas de diferença, deve lançar uma exceção")
+    void testIsClubeVisitanteComPartidaComoVisitanteMenorQue48HorasDiferenca() {
+        Clube clubeMandante = clubeMandante();
+        clubeMandante.setPartidasMandante(List.of());
+        clubeMandante.setPartidasVisitante(List.of());
+        Clube clubeVisitante = clubeVisitante();
+        clubeVisitante.setPartidasMandante(List.of());
+        clubeVisitante.setPartidasVisitante(List.of(new Partida(1L, clubeMandante, clubeVisitante, 1, 0, "1x0", estadio(), LocalDateTime.now())));
+        LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
+        Long idPartidaAtual = null; // Simulando que é uma nova partida
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isPartidaAposIntervalo(clubeMandante, clubeVisitante, dataHoraPartida, idPartidaAtual);
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        Assertions.assertEquals("Clube visitante já possue outra partida cadastrada com diferença menor do que 48 horas em relação a esta", exception.getReason());
+    }
 
     private PartidaRequestDTO partidaRequestDTO() {
         PartidaRequestDTO partidaRequestDTO = new PartidaRequestDTO();
