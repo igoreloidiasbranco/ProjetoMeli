@@ -313,6 +313,23 @@ class PartidaServiceImplTest {
         Assertions.assertEquals("Clube visitante já possue outra partida cadastrada com diferença menor do que 48 horas em relação a esta", exception.getReason());
     }
 
+    @Test
+    @DisplayName("Deve lançar uma exceção se o estádio já tiver uma partida marcada na data")
+    void testIsEstadioComPartidaNaData() {
+        Estadio estadio = estadio();
+        estadio.setPartidas(List.of(new Partida(1L, clubeMandante(), clubeVisitante(), 1, 0, "1x0", estadio, LocalDateTime.now())));
+        Long idPartidaAtual = null;
+
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isEstadioSemPartida(estadio, LocalDate.now(), idPartidaAtual);
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        Assertions.assertEquals("Estádio já possui partida marcada para esta data", exception.getReason());
+    }
+
     private PartidaRequestDTO partidaRequestDTO() {
         PartidaRequestDTO partidaRequestDTO = new PartidaRequestDTO();
         partidaRequestDTO.setIdClubeMandante(1L);
@@ -356,4 +373,16 @@ class PartidaServiceImplTest {
         return estadio;
     }
 
+    private Partida partidaExistente() {
+        Partida partida = new Partida();
+        partida.setId(1L);
+        partida.setIdClubeMandante(clubeMandante());
+        partida.setIdClubeVisitante(clubeVisitante());
+        partida.setGolsMandante(2);
+        partida.setGolsVisitante(1);
+        partida.setResultado("2x1");
+        partida.setIdEstadio(estadio());
+        partida.setDataHoraPartida(LocalDateTime.now());
+        return partida;
+    }
 }
