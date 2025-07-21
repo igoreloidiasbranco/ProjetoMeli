@@ -349,6 +349,23 @@ class PartidaServiceImplTest {
         Assertions.assertEquals("Estádio não encontrado", exception.getReason());
     }
 
+    @Test
+    @DisplayName("Deve lançar exceção se a partida não existir")
+    void testIsPartidaNaoExistente() {
+        Long idPartidaInexistente = 999L;
+
+        Mockito.when(partidaRepository.existsById(idPartidaInexistente)).thenReturn(false);
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isPartidaExiste(idPartidaInexistente);
+        });
+
+        Assertions.assertNotNull(exception);
+        Mockito.verify(partidaRepository, Mockito.times(1)).existsById(idPartidaInexistente);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Assertions.assertEquals("Partida não encontrada", exception.getReason());
+    }
+
     private PartidaRequestDTO partidaRequestDTO() {
         PartidaRequestDTO partidaRequestDTO = new PartidaRequestDTO();
         partidaRequestDTO.setIdClubeMandante(1L);
