@@ -143,6 +143,38 @@ class PartidaServiceImplTest {
         });
     }
 
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com data de partida antes da criação do clube mandante, deve lançar uma exceção")
+    void testIsDataHoraPartidaAntesCriacaoClubeMandante() {
+        Clube clubeMandante = clubeMandante();
+        clubeMandante.setDataCriacao(LocalDate.now().plusDays(1));
+        LocalDate dataPartida = LocalDate.now();
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isDataHoraAntesCriacaoClube(clubeMandante, clubeVisitante(), dataPartida);
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        Assertions.assertEquals("Data da partida não pode ser anterior à data de criação do clube mandante", exception.getReason());
+    }
+
+    @Test
+    @DisplayName("Dado um PartidaRequestDTO com data de partida antes da criação do clube visitante, deve lançar uma exceção")
+    void testIsDataHoraPartidaAntesCriacaoClubeVisitante() {
+        Clube clubeVisitante = clubeVisitante();
+        clubeVisitante.setDataCriacao(LocalDate.now().plusDays(1));
+        LocalDate dataPartida = LocalDate.now();
+
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
+            partidaService.isDataHoraAntesCriacaoClube(clubeMandante(), clubeVisitante, dataPartida);
+        });
+
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        Assertions.assertEquals("Data da partida não pode ser anterior à data de criação do clube visitante", exception.getReason());
+    }
+
     private PartidaRequestDTO partidaRequestDTO() {
         PartidaRequestDTO partidaRequestDTO = new PartidaRequestDTO();
         partidaRequestDTO.setIdClubeMandante(1L);
