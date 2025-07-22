@@ -46,8 +46,8 @@ class PartidaServiceImplTest {
 
         Mockito.when(clubeRepository.existsById(partidaRequestDTO.getIdClubeMandante())).thenReturn(true);
         Mockito.when(clubeRepository.existsById(partidaRequestDTO.getIdClubeVisitante())).thenReturn(true);
-        Mockito.when(clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeMandante())).thenReturn(clubeMandante());
-        Mockito.when(clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeVisitante())).thenReturn(clubeVisitante());
+        Mockito.when(clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeMandante())).thenReturn(clubeUm());
+        Mockito.when(clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeVisitante())).thenReturn(clubeDois());
         Mockito.when(estadioRepository.findById(partidaRequestDTO.getIdEstadio())).thenReturn(Optional.of(estadio()));
 
         Partida resultado = partidaService.validarPartida(partidaRequestDTO, partidaAtual);
@@ -81,6 +81,45 @@ class PartidaServiceImplTest {
         Assertions.assertEquals(partidaValidada.getResultado(), resultado.getResultado());
     }
 
+    @Test
+    @DisplayName("Dado uma Partida editada validada, deve retornar uma Partida atualizada com sucesso")
+    void testAtualizarPartida() {
+        Partida partidaEditada = partidaSalvaNoBanco();
+        partidaEditada.setIdClubeMandante(clubeDois());
+        partidaEditada.setIdClubeVisitante(clubeUm());
+        partidaEditada.setGolsMandante(0);
+        partidaEditada.setGolsVisitante(1);
+        partidaEditada.setResultado("0x1");
+
+
+        Mockito.when(partidaRepository.existsById(partidaEditada.getId())).thenReturn(true);
+        Mockito.when(partidaRepository.save(Mockito.any(Partida.class))).thenReturn(partidaEditada);
+        Partida resultado = partidaService.atualizarPartida(partidaEditada);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(partidaEditada.getIdClubeMandante().getId(), resultado.getIdClubeMandante().getId());
+        Assertions.assertEquals(partidaEditada.getIdClubeVisitante().getId(), resultado.getIdClubeVisitante().getId());
+        Assertions.assertEquals(partidaEditada.getGolsMandante(), resultado.getGolsMandante());
+        Assertions.assertEquals(partidaEditada.getGolsVisitante(), resultado.getGolsVisitante());
+        Assertions.assertEquals(partidaEditada.getIdEstadio().getId(), resultado.getIdEstadio().getId());
+        Assertions.assertEquals(partidaEditada.getDataHoraPartida().withNano(0), resultado.getDataHoraPartida().withNano(0));
+        Assertions.assertEquals(partidaEditada.getResultado(), resultado.getResultado());
+    }
+
+    @Test
+    @DisplayName("Dado um id de partida, deve deletar a partida com sucesso")
+    void testDeletarPartida() {
+        Long idPartida = 1L;
+
+        Mockito.when(partidaRepository.existsById(idPartida)).thenReturn(true);
+        Mockito.doNothing().when(partidaRepository).deleteById(idPartida);
+
+        Assertions.assertDoesNotThrow(() -> {
+            partidaService.deletarPartida(idPartida);
+        });
+
+        Mockito.verify(partidaRepository, Mockito.times(1)).deleteById(idPartida);
+    }
 
     @Test
     @DisplayName("Dado um PartidaRequestDTO com clube mandante que não existe, deve lançar uma exceção")
@@ -192,12 +231,12 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um PartidaRequestDTO com data de partida antes da criação do clube mandante, deve lançar uma exceção")
     void testIsDataHoraPartidaAntesCriacaoClubeMandante() {
-        Clube clubeMandante = clubeMandante();
+        Clube clubeMandante = clubeUm();
         clubeMandante.setDataCriacao(LocalDate.now().plusDays(1));
         LocalDate dataPartida = LocalDate.now();
 
         ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
-            partidaService.isDataHoraAntesCriacaoClube(clubeMandante, clubeVisitante(), dataPartida);
+            partidaService.isDataHoraAntesCriacaoClube(clubeMandante, clubeDois(), dataPartida);
         });
 
         Assertions.assertNotNull(exception);
@@ -208,12 +247,12 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um PartidaRequestDTO com data de partida antes da criação do clube visitante, deve lançar uma exceção")
     void testIsDataHoraPartidaAntesCriacaoClubeVisitante() {
-        Clube clubeVisitante = clubeVisitante();
+        Clube clubeVisitante = clubeDois();
         clubeVisitante.setDataCriacao(LocalDate.now().plusDays(1));
         LocalDate dataPartida = LocalDate.now();
 
         ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
-            partidaService.isDataHoraAntesCriacaoClube(clubeMandante(), clubeVisitante, dataPartida);
+            partidaService.isDataHoraAntesCriacaoClube(clubeUm(), clubeVisitante, dataPartida);
         });
 
         Assertions.assertNotNull(exception);
@@ -224,8 +263,8 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um PartidaRequestDTO com data de partida válida, não deve lançar uma exceção")
     void testIsDataHoraPartidaValida() {
-        Clube clubeMandante = clubeMandante();
-        Clube clubeVisitante = clubeVisitante();
+        Clube clubeMandante = clubeUm();
+        Clube clubeVisitante = clubeDois();
         LocalDate dataPartida = LocalDate.now().plusDays(1);
 
         Assertions.assertDoesNotThrow(() -> {
@@ -236,11 +275,11 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um PartidaRequestDTO com clube mandante inativo, deve lançar uma exceção")
     void testIsClubesAtivosComClubeMandanteInativo() {
-        Clube clubeMandante = clubeMandante();
+        Clube clubeMandante = clubeUm();
         clubeMandante.setAtivo(false);
 
         ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
-            partidaService.isClubesAtivos(clubeMandante, clubeVisitante());
+            partidaService.isClubesAtivos(clubeMandante, clubeDois());
         });
 
         Assertions.assertNotNull(exception);
@@ -251,11 +290,11 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um PartidaRequestDTO com clube visitante inativo, deve lançar uma exceção")
     void testIsClubesAtivosComClubeVisitanteInativo() {
-        Clube clubeVisitante = clubeMandante();
+        Clube clubeVisitante = clubeUm();
         clubeVisitante.setAtivo(false);
 
         ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
-            partidaService.isClubesAtivos(clubeMandante(), clubeVisitante);
+            partidaService.isClubesAtivos(clubeUm(), clubeVisitante);
         });
 
         Assertions.assertNotNull(exception);
@@ -266,8 +305,8 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um PartidaRequestDTO com clubes ativos, não deve lançar uma exceção")
     void testIsClubesAtivos() {
-        Clube clubeMandante = clubeMandante();
-        Clube clubeVisitante = clubeVisitante();
+        Clube clubeMandante = clubeUm();
+        Clube clubeVisitante = clubeDois();
 
         Assertions.assertDoesNotThrow(() -> {
             partidaService.isClubesAtivos(clubeMandante, clubeVisitante);
@@ -277,9 +316,9 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um clube mandante com partida como mandante marcada menor que 48 horas de diferença, deve lançar uma exceção")
     void testIsClubeMandanteComPartidaComoMandanteMenorQue48HorasDiferenca() {
-        Clube clubeMandante = clubeMandante();
-        clubeMandante.setPartidasMandante(List.of(new Partida(1L, clubeMandante, clubeVisitante(), 1, 0, "1x0", estadio(), LocalDateTime.now())));
-        Clube clubeVisitante = clubeVisitante();
+        Clube clubeMandante = clubeUm();
+        clubeMandante.setPartidasMandante(List.of(new Partida(1L, clubeMandante, clubeDois(), 1, 0, "1x0", estadio(), LocalDateTime.now())));
+        Clube clubeVisitante = clubeDois();
         LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
         Long idPartidaAtual = null; // Simulando que é uma nova partida
 
@@ -295,9 +334,9 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um clube mandante com partida como visitante marcada menor que 48 horas de diferença, deve lançar uma exceção")
     void testIsClubeMandanteComPartidaComoVisitanteMenorQue48HorasDiferenca() {
-        Clube clubeMandante = clubeMandante();
-        clubeMandante.setPartidasVisitante(List.of(new Partida(1L, clubeMandante, clubeVisitante(), 1, 0, "1x0", estadio(), LocalDateTime.now())));
-        Clube clubeVisitante = clubeVisitante();
+        Clube clubeMandante = clubeUm();
+        clubeMandante.setPartidasVisitante(List.of(new Partida(1L, clubeMandante, clubeDois(), 1, 0, "1x0", estadio(), LocalDateTime.now())));
+        Clube clubeVisitante = clubeDois();
         LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
         Long idPartidaAtual = null; // Simulando que é uma nova partida
 
@@ -313,8 +352,8 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um clube visitante com partida marcada menor que 48 horas de diferença, deve lançar uma exceção")
     void testIsClubeVisitanteComPartidaComoMandanteMenorQue48HorasDiferenca() {
-        Clube clubeMandante = clubeMandante();
-        Clube clubeVisitante = clubeVisitante();
+        Clube clubeMandante = clubeUm();
+        Clube clubeVisitante = clubeDois();
         clubeVisitante.setPartidasMandante(List.of(new Partida(1L, clubeMandante, clubeVisitante, 1, 0, "1x0", estadio(), LocalDateTime.now())));
         LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
         Long idPartidaAtual = null; // Simulando que é uma nova partida
@@ -331,8 +370,8 @@ class PartidaServiceImplTest {
     @Test
     @DisplayName("Dado um clube visitante com partida marcada menor que 48 horas de diferença, deve lançar uma exceção")
     void testIsClubeVisitanteComPartidaComoVisitanteMenorQue48HorasDiferenca() {
-        Clube clubeMandante = clubeMandante();
-        Clube clubeVisitante = clubeVisitante();
+        Clube clubeMandante = clubeUm();
+        Clube clubeVisitante = clubeDois();
         clubeVisitante.setPartidasVisitante(List.of(new Partida(1L, clubeMandante, clubeVisitante, 1, 0, "1x0", estadio(), LocalDateTime.now())));
         LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
         Long idPartidaAtual = null; // Simulando que é uma nova partida
@@ -350,7 +389,7 @@ class PartidaServiceImplTest {
     @DisplayName("Deve lançar uma exceção se o estádio já tiver uma partida marcada na data")
     void testIsEstadioComPartidaNaData() {
         Estadio estadio = estadio();
-        estadio.setPartidas(List.of(new Partida(1L, clubeMandante(), clubeVisitante(), 1, 0, "1x0", estadio, LocalDateTime.now())));
+        estadio.setPartidas(List.of(new Partida(1L, clubeUm(), clubeDois(), 1, 0, "1x0", estadio, LocalDateTime.now())));
         Long idPartidaAtual = null;
 
 
@@ -409,10 +448,10 @@ class PartidaServiceImplTest {
         return partidaRequestDTO;
     }
 
-    private Clube clubeMandante() {
+    private Clube clubeUm() {
         Clube clubeMandante = new Clube();
         clubeMandante.setId(1L);
-        clubeMandante.setNome("Clube Mandante");
+        clubeMandante.setNome("Clube Um");
         clubeMandante.setSigla(Sigla.SP);
         clubeMandante.setDataCriacao(LocalDate.now());
         clubeMandante.setAtivo(true);
@@ -421,10 +460,10 @@ class PartidaServiceImplTest {
         return clubeMandante;
     }
 
-    private Clube clubeVisitante() {
+    private Clube clubeDois() {
         Clube clubeVisitante = new Clube();
         clubeVisitante.setId(2L);
-        clubeVisitante.setNome("Clube Visitante");
+        clubeVisitante.setNome("Clube Dois");
         clubeVisitante.setSigla(Sigla.RJ);
         clubeVisitante.setDataCriacao(LocalDate.now());
         clubeVisitante.setAtivo(true);
@@ -445,8 +484,8 @@ class PartidaServiceImplTest {
     private Partida partidaSalvaNoBanco() {
         Partida partida = new Partida();
         partida.setId(1L);
-        partida.setIdClubeMandante(clubeMandante());
-        partida.setIdClubeVisitante(clubeVisitante());
+        partida.setIdClubeMandante(clubeUm());
+        partida.setIdClubeVisitante(clubeDois());
         partida.setGolsMandante(2);
         partida.setGolsVisitante(1);
         partida.setResultado("2x1");
