@@ -59,7 +59,26 @@ class PartidaServiceImplTest {
         Assertions.assertEquals(partidaRequestDTO.getGolsVisitante(), resultado.getGolsVisitante());
         Assertions.assertEquals(partidaRequestDTO.getIdEstadio(), resultado.getIdEstadio().getId());
         Assertions.assertEquals(partidaRequestDTO.getDataHoraPartida(), resultado.getDataHoraPartida());
+    }
 
+
+    @Test
+    @DisplayName("Dado uma Partida validada, deve retornar uma Partida salva com sucesso")
+    void testSalvarPartida() {
+        Partida partidaValidada = partidaSalvaNoBanco();
+        partidaValidada.setId(null);
+
+        Mockito.when(partidaRepository.save(Mockito.any(Partida.class))).thenReturn(partidaSalvaNoBanco());
+        Partida resultado = partidaService.salvarPartida(partidaValidada);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(partidaValidada.getIdClubeMandante().getId(), resultado.getIdClubeMandante().getId());
+        Assertions.assertEquals(partidaValidada.getIdClubeVisitante().getId(), resultado.getIdClubeVisitante().getId());
+        Assertions.assertEquals(partidaValidada.getGolsMandante(), resultado.getGolsMandante());
+        Assertions.assertEquals(partidaValidada.getGolsVisitante(), resultado.getGolsVisitante());
+        Assertions.assertEquals(partidaValidada.getIdEstadio().getId(), resultado.getIdEstadio().getId());
+        Assertions.assertEquals(partidaValidada.getDataHoraPartida().withNano(0), resultado.getDataHoraPartida().withNano(0));
+        Assertions.assertEquals(partidaValidada.getResultado(), resultado.getResultado());
     }
 
 
@@ -423,7 +442,7 @@ class PartidaServiceImplTest {
         return estadio;
     }
 
-    private Partida partidaExistente() {
+    private Partida partidaSalvaNoBanco() {
         Partida partida = new Partida();
         partida.setId(1L);
         partida.setIdClubeMandante(clubeMandante());
