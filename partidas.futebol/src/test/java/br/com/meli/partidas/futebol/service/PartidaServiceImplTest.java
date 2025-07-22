@@ -39,6 +39,31 @@ class PartidaServiceImplTest {
 
 
     @Test
+    @DisplayName("Dado um PartidaRequestDTO válido, deve retornar uma Partida validada")
+    void testValidarPartidaRequestDTO() {
+        PartidaRequestDTO partidaRequestDTO = partidaRequestDTO();
+        Long partidaAtual = null;
+
+        Mockito.when(clubeRepository.existsById(partidaRequestDTO.getIdClubeMandante())).thenReturn(true);
+        Mockito.when(clubeRepository.existsById(partidaRequestDTO.getIdClubeVisitante())).thenReturn(true);
+        Mockito.when(clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeMandante())).thenReturn(clubeMandante());
+        Mockito.when(clubeRepository.getReferenceById(partidaRequestDTO.getIdClubeVisitante())).thenReturn(clubeVisitante());
+        Mockito.when(estadioRepository.findById(partidaRequestDTO.getIdEstadio())).thenReturn(Optional.of(estadio()));
+
+        Partida resultado = partidaService.validarPartida(partidaRequestDTO, partidaAtual);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(partidaRequestDTO.getIdClubeMandante(), resultado.getIdClubeMandante().getId());
+        Assertions.assertEquals(partidaRequestDTO.getIdClubeVisitante(), resultado.getIdClubeVisitante().getId());
+        Assertions.assertEquals(partidaRequestDTO.getGolsMandante(), resultado.getGolsMandante());
+        Assertions.assertEquals(partidaRequestDTO.getGolsVisitante(), resultado.getGolsVisitante());
+        Assertions.assertEquals(partidaRequestDTO.getIdEstadio(), resultado.getIdEstadio().getId());
+        Assertions.assertEquals(partidaRequestDTO.getDataHoraPartida(), resultado.getDataHoraPartida());
+
+    }
+
+
+    @Test
     @DisplayName("Dado um PartidaRequestDTO com clube mandante que não existe, deve lançar uma exceção")
     void testIsClubesExistemComClubeMandanteInexistente() {
         PartidaRequestDTO partidaRequestDTO = partidaRequestDTO();
@@ -235,10 +260,7 @@ class PartidaServiceImplTest {
     void testIsClubeMandanteComPartidaComoMandanteMenorQue48HorasDiferenca() {
         Clube clubeMandante = clubeMandante();
         clubeMandante.setPartidasMandante(List.of(new Partida(1L, clubeMandante, clubeVisitante(), 1, 0, "1x0", estadio(), LocalDateTime.now())));
-        clubeMandante.setPartidasVisitante(List.of());
         Clube clubeVisitante = clubeVisitante();
-        clubeVisitante.setPartidasMandante(List.of());
-        clubeVisitante.setPartidasVisitante(List.of());
         LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
         Long idPartidaAtual = null; // Simulando que é uma nova partida
 
@@ -255,11 +277,8 @@ class PartidaServiceImplTest {
     @DisplayName("Dado um clube mandante com partida como visitante marcada menor que 48 horas de diferença, deve lançar uma exceção")
     void testIsClubeMandanteComPartidaComoVisitanteMenorQue48HorasDiferenca() {
         Clube clubeMandante = clubeMandante();
-        clubeMandante.setPartidasMandante(List.of());
         clubeMandante.setPartidasVisitante(List.of(new Partida(1L, clubeMandante, clubeVisitante(), 1, 0, "1x0", estadio(), LocalDateTime.now())));
         Clube clubeVisitante = clubeVisitante();
-        clubeVisitante.setPartidasMandante(List.of());
-        clubeVisitante.setPartidasVisitante(List.of());
         LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
         Long idPartidaAtual = null; // Simulando que é uma nova partida
 
@@ -276,11 +295,8 @@ class PartidaServiceImplTest {
     @DisplayName("Dado um clube visitante com partida marcada menor que 48 horas de diferença, deve lançar uma exceção")
     void testIsClubeVisitanteComPartidaComoMandanteMenorQue48HorasDiferenca() {
         Clube clubeMandante = clubeMandante();
-        clubeMandante.setPartidasMandante(List.of());
-        clubeMandante.setPartidasVisitante(List.of());
         Clube clubeVisitante = clubeVisitante();
         clubeVisitante.setPartidasMandante(List.of(new Partida(1L, clubeMandante, clubeVisitante, 1, 0, "1x0", estadio(), LocalDateTime.now())));
-        clubeVisitante.setPartidasVisitante(List.of());
         LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
         Long idPartidaAtual = null; // Simulando que é uma nova partida
 
@@ -297,10 +313,7 @@ class PartidaServiceImplTest {
     @DisplayName("Dado um clube visitante com partida marcada menor que 48 horas de diferença, deve lançar uma exceção")
     void testIsClubeVisitanteComPartidaComoVisitanteMenorQue48HorasDiferenca() {
         Clube clubeMandante = clubeMandante();
-        clubeMandante.setPartidasMandante(List.of());
-        clubeMandante.setPartidasVisitante(List.of());
         Clube clubeVisitante = clubeVisitante();
-        clubeVisitante.setPartidasMandante(List.of());
         clubeVisitante.setPartidasVisitante(List.of(new Partida(1L, clubeMandante, clubeVisitante, 1, 0, "1x0", estadio(), LocalDateTime.now())));
         LocalDateTime dataHoraPartida = LocalDateTime.now().plusHours(24);
         Long idPartidaAtual = null; // Simulando que é uma nova partida
@@ -384,8 +397,8 @@ class PartidaServiceImplTest {
         clubeMandante.setSigla(Sigla.SP);
         clubeMandante.setDataCriacao(LocalDate.now());
         clubeMandante.setAtivo(true);
-        clubeMandante.setPartidasMandante(null);
-        clubeMandante.setPartidasVisitante(null);
+        clubeMandante.setPartidasMandante(List.of());
+        clubeMandante.setPartidasVisitante(List.of());
         return clubeMandante;
     }
 
@@ -396,8 +409,8 @@ class PartidaServiceImplTest {
         clubeVisitante.setSigla(Sigla.RJ);
         clubeVisitante.setDataCriacao(LocalDate.now());
         clubeVisitante.setAtivo(true);
-        clubeVisitante.setPartidasMandante(null);
-        clubeVisitante.setPartidasVisitante(null);
+        clubeVisitante.setPartidasMandante(List.of());
+        clubeVisitante.setPartidasVisitante(List.of());
         return clubeVisitante;
     }
 
@@ -406,6 +419,7 @@ class PartidaServiceImplTest {
         estadio.setId(1L);
         estadio.setNome("Nome do Estádio");
         estadio.setSigla(Sigla.SP);
+        estadio.setPartidas(List.of());
         return estadio;
     }
 
