@@ -13,6 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
@@ -119,6 +123,72 @@ class PartidaServiceImplTest {
         });
 
         Mockito.verify(partidaRepository, Mockito.times(1)).deleteById(idPartida);
+    }
+
+    @Test
+    @DisplayName("Dado um id de partida, deve buscar a partida com sucesso")
+    void testBuscarPartidaPorId() {
+        Long idPartida = 1L;
+        Partida partidaSalvaNoBanco = partidaSalvaNoBanco();
+
+        Mockito.when(partidaRepository.existsById(idPartida)).thenReturn(true);
+        Mockito.when(partidaRepository.getReferenceById(idPartida)).thenReturn(partidaSalvaNoBanco);
+
+        Partida resultado = partidaService.buscarPartidaPorId(idPartida);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(partidaSalvaNoBanco.getId(), resultado.getId());
+        Assertions.assertEquals(partidaSalvaNoBanco.getIdClubeMandante().getId(), resultado.getIdClubeMandante().getId());
+        Assertions.assertEquals(partidaSalvaNoBanco.getIdClubeVisitante().getId(), resultado.getIdClubeVisitante().getId());
+        Assertions.assertEquals(partidaSalvaNoBanco.getGolsMandante(), resultado.getGolsMandante());
+        Assertions.assertEquals(partidaSalvaNoBanco.getGolsVisitante(), resultado.getGolsVisitante());
+        Assertions.assertEquals(partidaSalvaNoBanco.getIdEstadio().getId(), resultado.getIdEstadio().getId());
+        Assertions.assertEquals(partidaSalvaNoBanco.getDataHoraPartida().withNano(0), resultado.getDataHoraPartida().withNano(0));
+        Assertions.assertEquals(partidaSalvaNoBanco.getResultado(), resultado.getResultado());
+    }
+
+    @Test
+    @DisplayName("Deve retornar uma lista de partidas")
+    void testListarPartida() {
+        Pageable paginacao = PageRequest.of(0, 10);
+        Page<Partida> partidas = new PageImpl<>(List.of(partidaSalvaNoBanco()));
+
+        Mockito.when(partidaRepository.findAll(paginacao)).thenReturn(partidas);
+        Page<Partida> resultado = partidaService.listarPartidas(null, null, paginacao);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(partidas, resultado);
+    }
+
+    @Test
+    @DisplayName("Deve retornar uma lista de partidas filtrada por nome de clube")
+    void testListarPartidaPorNomeClube() {
+        Pageable paginacao = PageRequest.of(0, 10);
+        Page<Partida> partidas = new PageImpl<>(List.of(partidaSalvaNoBanco()));
+
+        Mockito.when(partidaRepository.listarPartidasPorClube("Clube Um", paginacao)).thenReturn(partidas);
+        Page<Partida> resultado = partidaService.listarPartidas("Clube Um", null, paginacao);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(partidas.getTotalPages(), resultado.getTotalPages());
+        Assertions.assertEquals(partidas.getTotalElements(), resultado.getTotalElements());
+        Assertions.assertEquals(partidas, resultado);
+
+    }
+
+    @Test
+    @DisplayName("Deve retornar uma lista de partidas filtrada por nome de estádio")
+    void testListarPartidaPorNomeEstadio() {
+        Pageable paginacao = PageRequest.of(0, 10);
+        Page<Partida> partidas = new PageImpl<>(List.of(partidaSalvaNoBanco()));
+
+        Mockito.when(partidaRepository.listarPartidasPorEstadio("Nome do Estádio", paginacao)).thenReturn(partidas);
+        Page<Partida> resultado = partidaService.listarPartidas(null, "Nome do Estádio", paginacao);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(partidas.getTotalPages(), resultado.getTotalPages());
+        Assertions.assertEquals(partidas.getTotalElements(), resultado.getTotalElements());
+        Assertions.assertEquals(partidas, resultado);
     }
 
     @Test
