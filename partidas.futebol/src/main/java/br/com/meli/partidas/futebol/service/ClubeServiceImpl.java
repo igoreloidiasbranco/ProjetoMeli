@@ -1,6 +1,7 @@
 package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.dto.Sigla;
+import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Partida;
 import br.com.meli.partidas.futebol.exception.IdNotFoundException;
@@ -113,5 +114,50 @@ public class ClubeServiceImpl implements ClubeService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "A data de criação do clube não pode ser maior que a data das partidas");
             }
         }
+    }
+
+    @Override
+    public RetrospectoDoClubeResponseDTO buscarRetrospectoClube(Long id) {
+        Clube clube = buscarClubePorId(id);
+        return Conversao.entityToRetrospectoDTO(clube);
+    }
+
+    @Override
+    public void calcularEstatisticas(Clube clube) {
+        int vitorias = 0, empates = 0, derrotas = 0, golsMarcados = 0, golsSofridos = 0, pontos = 0;
+
+        for (Partida p : clube.getPartidasMandante()) {
+            golsMarcados += p.getGolsMandante();
+            golsSofridos += p.getGolsVisitante();
+            if (p.getGolsMandante() > p.getGolsVisitante()) {
+                vitorias++;
+                pontos += 3;
+            } else if (p.getGolsMandante().equals(p.getGolsVisitante())) {
+                empates++;
+                pontos += 1;
+            } else {
+                derrotas++;
+            }
+        }
+        for (Partida p : clube.getPartidasVisitante()) {
+            golsMarcados += p.getGolsVisitante();
+            golsSofridos += p.getGolsMandante();
+            if (p.getGolsVisitante() > p.getGolsMandante()) {
+                vitorias++;
+                pontos += 3;
+            } else if (p.getGolsVisitante().equals(p.getGolsMandante())) {
+                empates++;
+                pontos += 1;
+            } else {
+                derrotas++;
+            }
+        }
+
+        clube.setVitorias(vitorias)
+                .setEmpates(empates)
+                .setDerrotas(derrotas)
+                .setGolsMarcados(golsMarcados)
+                .setGolsSofridos(golsSofridos)
+                .setPontos(pontos);
     }
 }
