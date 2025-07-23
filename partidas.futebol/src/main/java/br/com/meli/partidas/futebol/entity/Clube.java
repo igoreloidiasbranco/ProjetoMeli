@@ -23,6 +23,18 @@ public class Clube {
 
     private boolean ativo;
 
+    private Integer vitorias = 0;
+
+    private Integer empates = 0;
+
+    private Integer derrotas = 0;
+
+    private Integer golsMarcados = 0;
+
+    private Integer golsSofridos = 0;
+
+    private Integer pontos = 0;
+
     @OneToMany(mappedBy = "idClubeMandante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Partida> partidasMandante;
 
@@ -72,6 +84,60 @@ public class Clube {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public Integer getVitorias() {
+        return vitorias;
+    }
+
+    public Clube setVitorias(Integer vitorias) {
+        this.vitorias = vitorias;
+        return this;
+    }
+
+    public Integer getEmpates() {
+        return empates;
+    }
+
+    public Clube setEmpates(Integer empates) {
+        this.empates = empates;
+        return this;
+    }
+
+    public Integer getDerrotas() {
+        return derrotas;
+    }
+
+    public Clube setDerrotas(Integer derrotas) {
+        this.derrotas = derrotas;
+        return this;
+    }
+
+    public Integer getGolsMarcados() {
+        return golsMarcados;
+    }
+
+    public Clube setGolsMarcados(Integer golsMarcados) {
+        this.golsMarcados = golsMarcados;
+        return this;
+    }
+
+    public Integer getGolsSofridos() {
+        return golsSofridos;
+    }
+
+    public Clube setGolsSofridos(Integer golsSofridos) {
+        this.golsSofridos = golsSofridos;
+        return this;
+    }
+
+    public Integer getPontos() {
+        return pontos;
+    }
+
+    public Clube setPontos(Integer pontos) {
+        this.pontos = pontos;
+        return this;
     }
 
     public List<Partida> getPartidasMandante() {
