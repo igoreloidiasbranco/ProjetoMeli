@@ -27,11 +27,13 @@ public class PartidaServiceImpl implements PartidaService {
     private final ClubeRepository clubeRepository;
     private final PartidaRepository partidaRepository;
     private final EstadioRepository estadioRepository;
+    private final ClubeService clubeService;
 
-    public PartidaServiceImpl(PartidaRepository partidaRepository, ClubeRepository clubeRepository, EstadioRepository estadioRepository) {
+    public PartidaServiceImpl(PartidaRepository partidaRepository, ClubeRepository clubeRepository, EstadioRepository estadioRepository, ClubeService clubeService) {
         this.partidaRepository = partidaRepository;
         this.clubeRepository = clubeRepository;
         this.estadioRepository = estadioRepository;
+        this.clubeService = clubeService;
     }
 
     @Override
@@ -54,7 +56,26 @@ public class PartidaServiceImpl implements PartidaService {
     @Transactional
     public Partida salvarPartida(Partida partida) {
 
-        return partidaRepository.save(partida);
+        partidaRepository.save(partida);
+
+        // Recarregar os clubes e partidas, para garantir que as estatísticas sejam atualizadas
+        Clube clubeMandante = clubeRepository.findById(partida.getIdClubeMandante().getId()).orElseThrow();
+        Clube clubeVisitante = clubeRepository.findById(partida.getIdClubeVisitante().getId()).orElseThrow();
+
+        if (!clubeMandante.getPartidasMandante().contains(partida)) {
+            clubeMandante.getPartidasMandante().add(partida);
+        }
+        if (!clubeVisitante.getPartidasVisitante().contains(partida)) {
+            clubeVisitante.getPartidasVisitante().add(partida);
+        }
+
+        clubeService.calcularEstatisticas(clubeMandante);
+        clubeService.calcularEstatisticas(clubeVisitante);
+
+        clubeRepository.save(clubeMandante);
+        clubeRepository.save(clubeVisitante);
+
+        return partida;
     }
 
     @Override

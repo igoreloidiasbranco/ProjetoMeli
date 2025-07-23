@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ import java.util.Optional;
 class PartidaServiceImplTest {
 
     private PartidaService partidaService;
+    private ClubeService clubeService;
     private PartidaRepository partidaRepository;
     private ClubeRepository clubeRepository;
     private EstadioRepository estadioRepository;
@@ -35,10 +37,11 @@ class PartidaServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        clubeService = Mockito.mock(ClubeService.class);
         clubeRepository = Mockito.mock(ClubeRepository.class);
         estadioRepository = Mockito.mock(EstadioRepository.class);
         partidaRepository = Mockito.mock(PartidaRepository.class);
-        partidaService = new PartidaServiceImpl(partidaRepository, clubeRepository, estadioRepository);
+        partidaService = new PartidaServiceImpl(partidaRepository, clubeRepository, estadioRepository, clubeService);
     }
 
 
@@ -73,6 +76,8 @@ class PartidaServiceImplTest {
         partidaValidada.setId(null);
 
         Mockito.when(partidaRepository.save(Mockito.any(Partida.class))).thenReturn(partidaSalvaNoBanco());
+        Mockito.when(clubeRepository.findById(1L)).thenReturn(Optional.of(clubeUm()));
+        Mockito.when(clubeRepository.findById(2L)).thenReturn(Optional.of(clubeDois()));
         Partida resultado = partidaService.salvarPartida(partidaValidada);
 
         Assertions.assertNotNull(resultado);
@@ -525,8 +530,8 @@ class PartidaServiceImplTest {
         clubeMandante.setSigla(Sigla.SP);
         clubeMandante.setDataCriacao(LocalDate.now());
         clubeMandante.setAtivo(true);
-        clubeMandante.setPartidasMandante(List.of());
-        clubeMandante.setPartidasVisitante(List.of());
+        clubeMandante.setPartidasMandante(new ArrayList<>());
+        clubeMandante.setPartidasVisitante(new ArrayList<>());
         return clubeMandante;
     }
 
@@ -537,8 +542,8 @@ class PartidaServiceImplTest {
         clubeVisitante.setSigla(Sigla.RJ);
         clubeVisitante.setDataCriacao(LocalDate.now());
         clubeVisitante.setAtivo(true);
-        clubeVisitante.setPartidasMandante(List.of());
-        clubeVisitante.setPartidasVisitante(List.of());
+        clubeVisitante.setPartidasMandante(new ArrayList<>());
+        clubeVisitante.setPartidasVisitante(new ArrayList<>());
         return clubeVisitante;
     }
 
@@ -547,7 +552,7 @@ class PartidaServiceImplTest {
         estadio.setId(1L);
         estadio.setNome("Nome do Estádio");
         estadio.setSigla(Sigla.SP);
-        estadio.setPartidas(List.of());
+        estadio.setPartidas(new ArrayList<>());
         return estadio;
     }
 
