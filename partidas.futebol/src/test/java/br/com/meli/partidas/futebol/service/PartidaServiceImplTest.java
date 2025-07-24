@@ -101,8 +101,10 @@ class PartidaServiceImplTest {
         partidaEditada.setResultado("0x1");
 
 
-        Mockito.when(partidaRepository.existsById(partidaEditada.getId())).thenReturn(true);
+        Mockito.when(partidaRepository.findById(partidaEditada.getId())).thenReturn(Optional.of(partidaSalvaNoBanco()));
         Mockito.when(partidaRepository.save(Mockito.any(Partida.class))).thenReturn(partidaEditada);
+        Mockito.when(clubeRepository.findById(1L)).thenReturn(Optional.of(clubeUm()));
+        Mockito.when(clubeRepository.findById(2L)).thenReturn(Optional.of(clubeDois()));
         Partida resultado = partidaService.atualizarPartida(partidaEditada);
 
         Assertions.assertNotNull(resultado);
