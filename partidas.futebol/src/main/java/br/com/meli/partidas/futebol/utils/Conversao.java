@@ -83,4 +83,17 @@ public class Conversao {
         retrospecto.setGolsSofridos(clube.getGolsSofridos());
         return retrospecto;
     }
+
+    public static Partida atualizarCamposPartida(Partida partidaEditada) {
+        Partida partidaAtualizada = new Partida();
+
+        partidaAtualizada.setIdClubeMandante(partidaEditada.getIdClubeMandante());
+        partidaAtualizada.setIdClubeVisitante(partidaEditada.getIdClubeVisitante());
+        partidaAtualizada.setGolsMandante(partidaEditada.getGolsMandante());
+        partidaAtualizada.setGolsVisitante(partidaEditada.getGolsVisitante());
+        partidaAtualizada.setResultado(partidaEditada.getResultado());
+        partidaAtualizada.setIdEstadio(partidaEditada.getIdEstadio());
+        partidaAtualizada.setDataHoraPartida(partidaEditada.getDataHoraPartida());
+        return partidaAtualizada;
+    }
 }
