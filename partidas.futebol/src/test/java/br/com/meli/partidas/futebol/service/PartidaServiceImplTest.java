@@ -121,15 +121,15 @@ class PartidaServiceImplTest {
     @DisplayName("Dado um id de partida, deve deletar a partida com sucesso")
     void testDeletarPartida() {
         Long idPartida = 1L;
-
-        Mockito.when(partidaRepository.existsById(idPartida)).thenReturn(true);
-        Mockito.doNothing().when(partidaRepository).deleteById(idPartida);
+        Partida partida = partidaSalvaNoBanco();
+        Mockito.when(partidaRepository.findById(idPartida)).thenReturn(Optional.of(partida));
+        Mockito.doNothing().when(partidaRepository).delete(partida);
 
         Assertions.assertDoesNotThrow(() -> {
-            partidaService.deletarPartida(idPartida);
+            partidaService.deletarPartida(partida.getId());
         });
 
-        Mockito.verify(partidaRepository, Mockito.times(1)).deleteById(idPartida);
+        Mockito.verify(partidaRepository, Mockito.times(1)).delete(partida);
     }
 
     @Test
@@ -138,8 +138,7 @@ class PartidaServiceImplTest {
         Long idPartida = 1L;
         Partida partidaSalvaNoBanco = partidaSalvaNoBanco();
 
-        Mockito.when(partidaRepository.existsById(idPartida)).thenReturn(true);
-        Mockito.when(partidaRepository.getReferenceById(idPartida)).thenReturn(partidaSalvaNoBanco);
+        Mockito.when(partidaRepository.findById(idPartida)).thenReturn(Optional.of(partidaSalvaNoBanco));
 
         Partida resultado = partidaService.buscarPartidaPorId(idPartida);
 
@@ -502,14 +501,14 @@ class PartidaServiceImplTest {
     void testIsPartidaNaoExistente() {
         Long idPartidaInexistente = 999L;
 
-        Mockito.when(partidaRepository.existsById(idPartidaInexistente)).thenReturn(false);
+        Mockito.when(partidaRepository.findById(idPartidaInexistente)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
-            partidaService.isPartidaExiste(idPartidaInexistente);
+            partidaService.buscarPartidaPorId(idPartidaInexistente);
         });
 
         Assertions.assertNotNull(exception);
-        Mockito.verify(partidaRepository, Mockito.times(1)).existsById(idPartidaInexistente);
+        Mockito.verify(partidaRepository, Mockito.times(1)).findById(idPartidaInexistente);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         Assertions.assertEquals("Partida não encontrada", exception.getReason());
     }
