@@ -26,7 +26,6 @@ public interface PartidaService {
     void isPartidaAposIntervalo(Clube clubeMandante, Clube clubeVisitante, LocalDateTime dataHoraPartida, Long idPartidaAtual);
     Estadio buscarEstadio(Long idEstadio);
     void isEstadioSemPartida(Estadio estadio, LocalDate dataPartida, Long idPartidaAtual);
-    void isPartidaExiste(Long id);
     void calcularEstatisticasDosClubes(Partida partida);
     void removerPartidaDesatualizadaNosClubes(Partida partidaDesatualizada);
 }
