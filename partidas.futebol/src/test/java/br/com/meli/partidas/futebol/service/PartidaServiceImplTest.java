@@ -122,13 +122,18 @@ class PartidaServiceImplTest {
     void testDeletarPartida() {
         Long idPartida = 1L;
         Partida partida = partidaSalvaNoBanco();
+
         Mockito.when(partidaRepository.findById(idPartida)).thenReturn(Optional.of(partida));
+        Mockito.when(clubeRepository.findById(partida.getIdClubeMandante().getId())).thenReturn(Optional.of(clubeUm()));
+        Mockito.when(clubeRepository.findById(partida.getIdClubeVisitante().getId())).thenReturn(Optional.of(clubeDois()));
         Mockito.doNothing().when(partidaRepository).delete(partida);
 
         Assertions.assertDoesNotThrow(() -> {
             partidaService.deletarPartida(partida.getId());
         });
 
+        Mockito.verify(clubeRepository, Mockito.times(1)).findById(partida.getIdClubeMandante().getId());
+        Mockito.verify(clubeRepository, Mockito.times(1)).findById(partida.getIdClubeVisitante().getId());
         Mockito.verify(partidaRepository, Mockito.times(1)).delete(partida);
     }
 

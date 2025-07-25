@@ -82,6 +82,7 @@ public class PartidaServiceImpl implements PartidaService {
     public void deletarPartida(Long id) {
 
         Partida partida = buscarPartidaPorId(id);
+        removerPartidaDesatualizadaNosClubes(partida);
         partidaRepository.delete(partida);
     }
 
