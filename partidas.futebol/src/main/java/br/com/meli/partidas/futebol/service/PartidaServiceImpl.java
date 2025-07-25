@@ -228,17 +228,11 @@ public class PartidaServiceImpl implements PartidaService {
         Clube clubeMandante = buscarClube(partida.getIdClubeMandante().getId());
         Clube clubeVisitante = buscarClube(partida.getIdClubeVisitante().getId());
 
-        clubeMandante.getPartidasMandante().removeIf(p -> p.getId() != null && p.getId().equals(partida.getId()));
-        clubeVisitante.getPartidasVisitante().removeIf(p -> p.getId() != null && p.getId().equals(partida.getId()));
-
         clubeMandante.getPartidasMandante().add(partida);
         clubeVisitante.getPartidasVisitante().add(partida);
 
         clubeService.calcularEstatisticas(clubeMandante);
         clubeService.calcularEstatisticas(clubeVisitante);
-
-        clubeRepository.save(clubeMandante);
-        clubeRepository.save(clubeVisitante);
     }
 
 
@@ -253,8 +247,5 @@ public class PartidaServiceImpl implements PartidaService {
 
         clubeService.calcularEstatisticas(clubeMandanteAntigo);
         clubeService.calcularEstatisticas(clubeVisitanteAntigo);
-
-        clubeRepository.save(clubeMandanteAntigo);
-        clubeRepository.save(clubeVisitanteAntigo);
     }
 }
