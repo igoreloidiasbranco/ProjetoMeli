@@ -1,6 +1,7 @@
 package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
+import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeContraAdversarioResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.entity.Partida;
@@ -28,4 +29,5 @@ public interface PartidaService {
     void isEstadioSemPartida(Estadio estadio, LocalDate dataPartida, Long idPartidaAtual);
     void calcularEstatisticasDosClubes(Partida partida);
     void removerPartidaDesatualizadaNosClubes(Partida partidaDesatualizada);
+    RetrospectoDoClubeContraAdversarioResponseDTO buscarRetrospectoDoClubeContraAdversario(Long idClube, Long idAdversario);
 }

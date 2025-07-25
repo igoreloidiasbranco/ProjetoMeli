@@ -1,6 +1,7 @@
 package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
+import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeContraAdversarioResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.entity.Partida;
@@ -132,6 +133,13 @@ public class PartidaServiceImpl implements PartidaService {
         }
     }
 
+    public void isClubesDiferentes(Long idClube, Long idAdversario) {
+        if (idClube.equals(idAdversario)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Clubes não podem ser iguais");
+        }
+    }
+
     @Override
     public void isGolsPositivos(Integer golsMandante, Integer golsVisitante) {
         if (golsMandante < 0 || golsVisitante < 0) {
@@ -248,5 +256,13 @@ public class PartidaServiceImpl implements PartidaService {
 
         clubeService.calcularEstatisticas(clubeMandanteAntigo);
         clubeService.calcularEstatisticas(clubeVisitanteAntigo);
+    }
+
+    @Override
+    public RetrospectoDoClubeContraAdversarioResponseDTO buscarRetrospectoDoClubeContraAdversario(Long idClube, Long idAdversario) {
+        isClubesDiferentes(idClube, idAdversario);
+        Clube clube = buscarClube(idClube);
+        Clube adversario = buscarClube(idAdversario);
+        return null;
     }
 }
