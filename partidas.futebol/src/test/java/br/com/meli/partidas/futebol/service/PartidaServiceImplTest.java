@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ import java.util.Optional;
 class PartidaServiceImplTest {
 
     private PartidaService partidaService;
+    private ClubeService clubeService;
     private PartidaRepository partidaRepository;
     private ClubeRepository clubeRepository;
     private EstadioRepository estadioRepository;
@@ -35,10 +37,11 @@ class PartidaServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        clubeService = Mockito.mock(ClubeService.class);
         clubeRepository = Mockito.mock(ClubeRepository.class);
         estadioRepository = Mockito.mock(EstadioRepository.class);
         partidaRepository = Mockito.mock(PartidaRepository.class);
-        partidaService = new PartidaServiceImpl(partidaRepository, clubeRepository, estadioRepository);
+        partidaService = new PartidaServiceImpl(partidaRepository, clubeRepository, estadioRepository, clubeService);
     }
 
 
@@ -73,6 +76,8 @@ class PartidaServiceImplTest {
         partidaValidada.setId(null);
 
         Mockito.when(partidaRepository.save(Mockito.any(Partida.class))).thenReturn(partidaSalvaNoBanco());
+        Mockito.when(clubeRepository.findById(1L)).thenReturn(Optional.of(clubeUm()));
+        Mockito.when(clubeRepository.findById(2L)).thenReturn(Optional.of(clubeDois()));
         Partida resultado = partidaService.salvarPartida(partidaValidada);
 
         Assertions.assertNotNull(resultado);
@@ -96,8 +101,10 @@ class PartidaServiceImplTest {
         partidaEditada.setResultado("0x1");
 
 
-        Mockito.when(partidaRepository.existsById(partidaEditada.getId())).thenReturn(true);
+        Mockito.when(partidaRepository.findById(partidaEditada.getId())).thenReturn(Optional.of(partidaSalvaNoBanco()));
         Mockito.when(partidaRepository.save(Mockito.any(Partida.class))).thenReturn(partidaEditada);
+        Mockito.when(clubeRepository.findById(1L)).thenReturn(Optional.of(clubeUm()));
+        Mockito.when(clubeRepository.findById(2L)).thenReturn(Optional.of(clubeDois()));
         Partida resultado = partidaService.atualizarPartida(partidaEditada);
 
         Assertions.assertNotNull(resultado);
@@ -114,15 +121,20 @@ class PartidaServiceImplTest {
     @DisplayName("Dado um id de partida, deve deletar a partida com sucesso")
     void testDeletarPartida() {
         Long idPartida = 1L;
+        Partida partida = partidaSalvaNoBanco();
 
-        Mockito.when(partidaRepository.existsById(idPartida)).thenReturn(true);
-        Mockito.doNothing().when(partidaRepository).deleteById(idPartida);
+        Mockito.when(partidaRepository.findById(idPartida)).thenReturn(Optional.of(partida));
+        Mockito.when(clubeRepository.findById(partida.getIdClubeMandante().getId())).thenReturn(Optional.of(clubeUm()));
+        Mockito.when(clubeRepository.findById(partida.getIdClubeVisitante().getId())).thenReturn(Optional.of(clubeDois()));
+        Mockito.doNothing().when(partidaRepository).delete(partida);
 
         Assertions.assertDoesNotThrow(() -> {
-            partidaService.deletarPartida(idPartida);
+            partidaService.deletarPartida(partida.getId());
         });
 
-        Mockito.verify(partidaRepository, Mockito.times(1)).deleteById(idPartida);
+        Mockito.verify(clubeRepository, Mockito.times(1)).findById(partida.getIdClubeMandante().getId());
+        Mockito.verify(clubeRepository, Mockito.times(1)).findById(partida.getIdClubeVisitante().getId());
+        Mockito.verify(partidaRepository, Mockito.times(1)).delete(partida);
     }
 
     @Test
@@ -131,8 +143,7 @@ class PartidaServiceImplTest {
         Long idPartida = 1L;
         Partida partidaSalvaNoBanco = partidaSalvaNoBanco();
 
-        Mockito.when(partidaRepository.existsById(idPartida)).thenReturn(true);
-        Mockito.when(partidaRepository.getReferenceById(idPartida)).thenReturn(partidaSalvaNoBanco);
+        Mockito.when(partidaRepository.findById(idPartida)).thenReturn(Optional.of(partidaSalvaNoBanco));
 
         Partida resultado = partidaService.buscarPartidaPorId(idPartida);
 
@@ -495,14 +506,14 @@ class PartidaServiceImplTest {
     void testIsPartidaNaoExistente() {
         Long idPartidaInexistente = 999L;
 
-        Mockito.when(partidaRepository.existsById(idPartidaInexistente)).thenReturn(false);
+        Mockito.when(partidaRepository.findById(idPartidaInexistente)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class, () -> {
-            partidaService.isPartidaExiste(idPartidaInexistente);
+            partidaService.buscarPartidaPorId(idPartidaInexistente);
         });
 
         Assertions.assertNotNull(exception);
-        Mockito.verify(partidaRepository, Mockito.times(1)).existsById(idPartidaInexistente);
+        Mockito.verify(partidaRepository, Mockito.times(1)).findById(idPartidaInexistente);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         Assertions.assertEquals("Partida não encontrada", exception.getReason());
     }
@@ -525,8 +536,8 @@ class PartidaServiceImplTest {
         clubeMandante.setSigla(Sigla.SP);
         clubeMandante.setDataCriacao(LocalDate.now());
         clubeMandante.setAtivo(true);
-        clubeMandante.setPartidasMandante(List.of());
-        clubeMandante.setPartidasVisitante(List.of());
+        clubeMandante.setPartidasMandante(new ArrayList<>());
+        clubeMandante.setPartidasVisitante(new ArrayList<>());
         return clubeMandante;
     }
 
@@ -537,8 +548,8 @@ class PartidaServiceImplTest {
         clubeVisitante.setSigla(Sigla.RJ);
         clubeVisitante.setDataCriacao(LocalDate.now());
         clubeVisitante.setAtivo(true);
-        clubeVisitante.setPartidasMandante(List.of());
-        clubeVisitante.setPartidasVisitante(List.of());
+        clubeVisitante.setPartidasMandante(new ArrayList<>());
+        clubeVisitante.setPartidasVisitante(new ArrayList<>());
         return clubeVisitante;
     }
 
@@ -547,7 +558,7 @@ class PartidaServiceImplTest {
         estadio.setId(1L);
         estadio.setNome("Nome do Estádio");
         estadio.setSigla(Sigla.SP);
-        estadio.setPartidas(List.of());
+        estadio.setPartidas(new ArrayList<>());
         return estadio;
     }
 

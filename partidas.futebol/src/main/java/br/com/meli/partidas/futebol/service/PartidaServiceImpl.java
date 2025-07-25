@@ -27,11 +27,13 @@ public class PartidaServiceImpl implements PartidaService {
     private final ClubeRepository clubeRepository;
     private final PartidaRepository partidaRepository;
     private final EstadioRepository estadioRepository;
+    private final ClubeService clubeService;
 
-    public PartidaServiceImpl(PartidaRepository partidaRepository, ClubeRepository clubeRepository, EstadioRepository estadioRepository) {
+    public PartidaServiceImpl(PartidaRepository partidaRepository, ClubeRepository clubeRepository, EstadioRepository estadioRepository, ClubeService clubeService) {
         this.partidaRepository = partidaRepository;
         this.clubeRepository = clubeRepository;
         this.estadioRepository = estadioRepository;
+        this.clubeService = clubeService;
     }
 
     @Override
@@ -54,28 +56,41 @@ public class PartidaServiceImpl implements PartidaService {
     @Transactional
     public Partida salvarPartida(Partida partida) {
 
-        return partidaRepository.save(partida);
+        partidaRepository.save(partida);
+        calcularEstatisticasDosClubes(partida);
+        return partida;
     }
 
     @Override
     @Transactional
     public Partida atualizarPartida(Partida partidaEditada) {
 
-        isPartidaExiste(partidaEditada.getId());
-        return partidaRepository.save(partidaEditada);
+        Partida partidaDesatualizada = buscarPartidaPorId(partidaEditada.getId());
+
+        removerPartidaDesatualizadaNosClubes(partidaDesatualizada);
+
+        partidaRepository.save(partidaEditada);
+
+        calcularEstatisticasDosClubes(partidaEditada);
+
+
+        return partidaEditada;
     }
 
     @Override
     @Transactional
     public void deletarPartida(Long id) {
-        isPartidaExiste(id);
-        partidaRepository.deleteById(id);
+
+        Partida partida = buscarPartidaPorId(id);
+        removerPartidaDesatualizadaNosClubes(partida);
+        partidaRepository.delete(partida);
     }
 
     @Override
     public Partida buscarPartidaPorId(Long id) {
-        isPartidaExiste(id);
-        Partida partidaEncontrada = partidaRepository.getReferenceById(id);
+
+        Partida partidaEncontrada = partidaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Partida não encontrada"));
         return partidaEncontrada;
     }
 
@@ -202,12 +217,36 @@ public class PartidaServiceImpl implements PartidaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estádio não encontrado"));
     }
 
+    public Clube buscarClube(Long idClube) {
+        return clubeRepository.findById(idClube)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clube não encontrado"));
+    }
+
 
     @Override
-    public void isPartidaExiste(Long id) {
-        boolean existePartida = partidaRepository.existsById(id);
-        if (!existePartida) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Partida não encontrada");
-        }
+    @Transactional
+    public void calcularEstatisticasDosClubes(Partida partida) {
+        Clube clubeMandante = buscarClube(partida.getIdClubeMandante().getId());
+        Clube clubeVisitante = buscarClube(partida.getIdClubeVisitante().getId());
+
+        clubeMandante.getPartidasMandante().add(partida);
+        clubeVisitante.getPartidasVisitante().add(partida);
+
+        clubeService.calcularEstatisticas(clubeMandante);
+        clubeService.calcularEstatisticas(clubeVisitante);
+    }
+
+
+    @Override
+    @Transactional
+    public void removerPartidaDesatualizadaNosClubes(Partida partidaDesatualizada) {
+        Clube clubeMandanteAntigo = buscarClube(partidaDesatualizada.getIdClubeMandante().getId());
+        Clube clubeVisitanteAntigo = buscarClube(partidaDesatualizada.getIdClubeVisitante().getId());
+
+        clubeMandanteAntigo.getPartidasMandante().removeIf(p -> p.getId().equals(partidaDesatualizada.getId()));
+        clubeVisitanteAntigo.getPartidasVisitante().removeIf(p -> p.getId().equals(partidaDesatualizada.getId()));
+
+        clubeService.calcularEstatisticas(clubeMandanteAntigo);
+        clubeService.calcularEstatisticas(clubeVisitanteAntigo);
     }
 }

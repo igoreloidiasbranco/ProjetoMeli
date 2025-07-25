@@ -3,6 +3,7 @@ package br.com.meli.partidas.futebol.controller;
 import br.com.meli.partidas.futebol.dto.Sigla;
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
+import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.service.ClubeService;
 import br.com.meli.partidas.futebol.utils.Conversao;
@@ -69,4 +70,9 @@ public class ClubeController {
         return page;
     }
 
+    @GetMapping("/retrospecto/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public RetrospectoDoClubeResponseDTO buscarRetrospectoClube(@PathVariable Long id) {
+        return clubeService.buscarRetrospectoClube(id);
+    }
 }

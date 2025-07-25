@@ -6,6 +6,7 @@ import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
 import br.com.meli.partidas.futebol.dto.response.EstadioResponseDTO;
 import br.com.meli.partidas.futebol.dto.response.PartidaResponseDTO;
+import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.entity.Partida;
@@ -69,5 +70,17 @@ public class Conversao {
         partidaResponseDTO.setIdClubeVisitante(partida.getIdClubeVisitante().getId());
         partidaResponseDTO.setIdEstadio(partida.getIdEstadio().getId());
         return partidaResponseDTO;
+    }
+
+    public static RetrospectoDoClubeResponseDTO entityToRetrospectoDTO(Clube clube) {
+
+        RetrospectoDoClubeResponseDTO retrospecto = new RetrospectoDoClubeResponseDTO();
+        retrospecto.setNomeClube(clube.getNome());
+        retrospecto.setVitorias(clube.getVitorias());
+        retrospecto.setEmpates(clube.getEmpates());
+        retrospecto.setDerrotas(clube.getDerrotas());
+        retrospecto.setGolsMarcados(clube.getGolsMarcados());
+        retrospecto.setGolsSofridos(clube.getGolsSofridos());
+        return retrospecto;
     }
 }
