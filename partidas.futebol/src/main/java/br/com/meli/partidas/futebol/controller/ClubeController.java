@@ -70,7 +70,7 @@ public class ClubeController {
         return page;
     }
 
-    @GetMapping("/retrospecto/{id}")
+    @GetMapping("/{id}/retrospecto")
     @ResponseStatus(HttpStatus.OK)
     public RetrospectoDoClubeResponseDTO buscarRetrospectoClube(@PathVariable Long id) {
         return clubeService.buscarRetrospectoClube(id);
