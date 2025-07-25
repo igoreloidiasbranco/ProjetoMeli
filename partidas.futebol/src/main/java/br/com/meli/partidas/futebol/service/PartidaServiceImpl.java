@@ -65,33 +65,31 @@ public class PartidaServiceImpl implements PartidaService {
     @Transactional
     public Partida atualizarPartida(Partida partidaEditada) {
 
-        Partida partidaDesatualizada = partidaRepository.findById(partidaEditada.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Partida não encontrada"));
+        Partida partidaDesatualizada = buscarPartidaPorId(partidaEditada.getId());
 
         removerPartidaDesatualizadaNosClubes(partidaDesatualizada);
 
-        Partida partidaAtualizada = Conversao.atualizarCamposPartida(partidaEditada);
-        partidaAtualizada.setId(partidaEditada.getId());
+        partidaRepository.save(partidaEditada);
 
-        partidaRepository.save(partidaAtualizada);
-
-        calcularEstatisticasDosClubes(partidaAtualizada);
+        calcularEstatisticasDosClubes(partidaEditada);
 
 
-        return partidaAtualizada;
+        return partidaEditada;
     }
 
     @Override
     @Transactional
     public void deletarPartida(Long id) {
-        isPartidaExiste(id);
-        partidaRepository.deleteById(id);
+
+        Partida partida = buscarPartidaPorId(id);
+        partidaRepository.delete(partida);
     }
 
     @Override
     public Partida buscarPartidaPorId(Long id) {
-        isPartidaExiste(id);
-        Partida partidaEncontrada = partidaRepository.getReferenceById(id);
+
+        Partida partidaEncontrada = partidaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Partida não encontrada"));
         return partidaEncontrada;
     }
 
@@ -225,18 +223,10 @@ public class PartidaServiceImpl implements PartidaService {
 
 
     @Override
-    public void isPartidaExiste(Long id) {
-        boolean existePartida = partidaRepository.existsById(id);
-        if (!existePartida) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Partida não encontrada");
-        }
-    }
-
-    @Override
     @Transactional
     public void calcularEstatisticasDosClubes(Partida partida) {
-        Clube clubeMandante = clubeRepository.findById(partida.getIdClubeMandante().getId()).orElseThrow();
-        Clube clubeVisitante = clubeRepository.findById(partida.getIdClubeVisitante().getId()).orElseThrow();
+        Clube clubeMandante = buscarClube(partida.getIdClubeMandante().getId());
+        Clube clubeVisitante = buscarClube(partida.getIdClubeVisitante().getId());
 
         clubeMandante.getPartidasMandante().removeIf(p -> p.getId() != null && p.getId().equals(partida.getId()));
         clubeVisitante.getPartidasVisitante().removeIf(p -> p.getId() != null && p.getId().equals(partida.getId()));
