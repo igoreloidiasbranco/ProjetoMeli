@@ -159,5 +159,7 @@ public class ClubeServiceImpl implements ClubeService {
                 .setGolsMarcados(golsMarcados)
                 .setGolsSofridos(golsSofridos)
                 .setPontos(pontos);
+
+        clubeRepository.save(clube);
     }
 }
