@@ -1,6 +1,7 @@
 package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
+import br.com.meli.partidas.futebol.dto.response.ConfrontoDiretoResponseDTO;
 import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeContraOutroResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
@@ -315,5 +316,21 @@ public class PartidaServiceImpl implements PartidaService {
                 .setGolsSofridos(golsSofridos);
 
         return retrospecto;
+    }
+
+    @Override
+    public ConfrontoDiretoResponseDTO buscarConfrontoDireto(Long idClubeUm, Long idClubeDois) {
+        Clube clubeUm = buscarClube(idClubeUm);
+        Clube clubeDois = buscarClube(idClubeDois);
+        List<Partida> confrontosDiretos = new ArrayList<>();
+        confrontosDiretos.addAll(partidaRepository.findByIdClubeMandanteAndIdClubeVisitante(clubeUm, clubeDois));
+        confrontosDiretos.addAll(partidaRepository.findByIdClubeMandanteAndIdClubeVisitante(clubeDois, clubeUm));
+
+        RetrospectoDoClubeContraOutroResponseDTO retrospectoUm = buscarRetrospectoDoClubeContraOutro(idClubeUm, idClubeDois);
+        RetrospectoDoClubeContraOutroResponseDTO retrospectoDois = buscarRetrospectoDoClubeContraOutro(idClubeDois, idClubeUm);
+
+        return new ConfrontoDiretoResponseDTO().setPartidas(Conversao.entityListToDTOList(confrontosDiretos))
+                .setRetrospectoClubeUm(retrospectoUm)
+                .setRetrospectoClubeDois(retrospectoDois);
     }
 }

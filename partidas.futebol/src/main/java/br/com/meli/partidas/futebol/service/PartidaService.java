@@ -1,6 +1,7 @@
 package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
+import br.com.meli.partidas.futebol.dto.response.ConfrontoDiretoResponseDTO;
 import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeContraOutroResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
@@ -35,4 +36,5 @@ public interface PartidaService {
     List<Partida> buscarPartidasEntreClubes(Clube clubeUm, Clube clubeDois);
     RetrospectoDoClubeContraOutroResponseDTO buscarRetrospectoDoClubeContraOutro(Long idClubeUm, Long idClubeDois);
     RetrospectoDoClubeContraOutroResponseDTO calcularRetrospectoClubeContraOutro(List<Partida> partidas);
+    ConfrontoDiretoResponseDTO buscarConfrontoDireto(Long idClubeUm, Long idClubeDois);
 }
