@@ -1,13 +1,14 @@
 package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
-import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeContraAdversarioResponseDTO;
+import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeContraOutroResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.entity.Partida;
 import br.com.meli.partidas.futebol.repository.ClubeRepository;
 import br.com.meli.partidas.futebol.repository.EstadioRepository;
 import br.com.meli.partidas.futebol.repository.PartidaRepository;
+import br.com.meli.partidas.futebol.utils.Builder;
 import br.com.meli.partidas.futebol.utils.Conversao;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -258,11 +259,58 @@ public class PartidaServiceImpl implements PartidaService {
         clubeService.calcularEstatisticas(clubeVisitanteAntigo);
     }
 
+
+    public List<Partida> buscarPartidasEntreClubes(Clube clubeUm, Clube clubeDois) {
+        return partidaRepository.findByIdClubeMandanteAndIdClubeVisitante(clubeUm, clubeDois);
+    }
+
     @Override
-    public RetrospectoDoClubeContraAdversarioResponseDTO buscarRetrospectoDoClubeContraAdversario(Long idClube, Long idAdversario) {
-        isClubesDiferentes(idClube, idAdversario);
-        Clube clube = buscarClube(idClube);
-        Clube adversario = buscarClube(idAdversario);
-        return null;
+    public RetrospectoDoClubeContraOutroResponseDTO buscarRetrospectoDoClubeContraOutro(Long idClubeUm, Long idClubeDois) {
+        isClubesDiferentes(idClubeUm, idClubeDois);
+        Clube clube = buscarClube(idClubeUm);
+        Clube adversario = buscarClube(idClubeDois);
+        List<Partida> partidasComoMandante = buscarPartidasEntreClubes(clube, adversario);
+        List<Partida> partidasComoVisitante = buscarPartidasEntreClubes(adversario, clube);
+
+        if (partidasComoMandante.isEmpty() && partidasComoVisitante.isEmpty()) {
+            return Builder.retrospectoDoClubeContraOutroResponseDTOVazio(clube, adversario);
+        }
+
+        RetrospectoDoClubeContraOutroResponseDTO retrospectoComoMandante = calcularRetrospectoClubeContraOutro(partidasComoMandante);
+        RetrospectoDoClubeContraOutroResponseDTO retrospectoComoVisitante = calcularRetrospectoClubeContraOutro(partidasComoVisitante);
+
+        return new RetrospectoDoClubeContraOutroResponseDTO()
+                .setNomeClube(clube.getNome())
+                .setNomeAdversario(adversario.getNome())
+                .setVitorias(retrospectoComoMandante.getVitorias() + retrospectoComoVisitante.getDerrotas())
+                .setEmpates(retrospectoComoMandante.getEmpates() + retrospectoComoVisitante.getEmpates())
+                .setDerrotas(retrospectoComoMandante.getDerrotas() + retrospectoComoVisitante.getVitorias())
+                .setGolsMarcados(retrospectoComoMandante.getGolsMarcados() + retrospectoComoVisitante.getGolsSofridos())
+                .setGolsSofridos(retrospectoComoMandante.getGolsSofridos() + retrospectoComoVisitante.getGolsMarcados());
+    }
+
+    public RetrospectoDoClubeContraOutroResponseDTO calcularRetrospectoClubeContraOutro(List<Partida> partidas) {
+        RetrospectoDoClubeContraOutroResponseDTO retrospecto = new RetrospectoDoClubeContraOutroResponseDTO();
+        int vitorias = 0, empates = 0, derrotas = 0, golsMarcados = 0, golsSofridos = 0;
+
+        for (Partida partida : partidas) {
+            if (partida.getGolsMandante() > partida.getGolsVisitante()) {
+                vitorias++;
+            } else if (partida.getGolsMandante().equals(partida.getGolsVisitante())) {
+                empates++;
+            } else {
+                derrotas++;
+            }
+            golsMarcados += partida.getGolsMandante();
+            golsSofridos += partida.getGolsVisitante();
+        }
+
+        retrospecto.setVitorias(vitorias)
+                .setEmpates(empates)
+                .setDerrotas(derrotas)
+                .setGolsMarcados(golsMarcados)
+                .setGolsSofridos(golsSofridos);
+
+        return retrospecto;
     }
 }
