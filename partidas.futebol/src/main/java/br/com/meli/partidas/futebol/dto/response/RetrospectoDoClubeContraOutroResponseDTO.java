@@ -1,6 +1,6 @@
 package br.com.meli.partidas.futebol.dto.response;
 
-public class RetrospectoDoClubeContraAdversarioResponseDTO {
+public class RetrospectoDoClubeContraOutroResponseDTO {
 
     private String nomeClube;
     private String nomeAdversario;
@@ -38,37 +38,37 @@ public class RetrospectoDoClubeContraAdversarioResponseDTO {
         return golsSofridos;
     }
 
-    public RetrospectoDoClubeContraAdversarioResponseDTO setNomeClube(String nomeClube) {
+    public RetrospectoDoClubeContraOutroResponseDTO setNomeClube(String nomeClube) {
         this.nomeClube = nomeClube;
         return this;
     }
 
-    public RetrospectoDoClubeContraAdversarioResponseDTO setNomeAdversario(String nomeAdversario) {
+    public RetrospectoDoClubeContraOutroResponseDTO setNomeAdversario(String nomeAdversario) {
         this.nomeAdversario = nomeAdversario;
         return this;
     }
 
-    public RetrospectoDoClubeContraAdversarioResponseDTO setVitorias(Integer vitorias) {
+    public RetrospectoDoClubeContraOutroResponseDTO setVitorias(Integer vitorias) {
         this.vitorias = vitorias;
         return this;
     }
 
-    public RetrospectoDoClubeContraAdversarioResponseDTO setEmpates(Integer empates) {
+    public RetrospectoDoClubeContraOutroResponseDTO setEmpates(Integer empates) {
         this.empates = empates;
         return this;
     }
 
-    public RetrospectoDoClubeContraAdversarioResponseDTO setDerrotas(Integer derrotas) {
+    public RetrospectoDoClubeContraOutroResponseDTO setDerrotas(Integer derrotas) {
         this.derrotas = derrotas;
         return this;
     }
 
-    public RetrospectoDoClubeContraAdversarioResponseDTO setGolsMarcados(Integer golsMarcados) {
+    public RetrospectoDoClubeContraOutroResponseDTO setGolsMarcados(Integer golsMarcados) {
         this.golsMarcados = golsMarcados;
         return this;
     }
 
-    public RetrospectoDoClubeContraAdversarioResponseDTO setGolsSofridos(Integer golsSofridos) {
+    public RetrospectoDoClubeContraOutroResponseDTO setGolsSofridos(Integer golsSofridos) {
         this.golsSofridos = golsSofridos;
         return this;
     }
