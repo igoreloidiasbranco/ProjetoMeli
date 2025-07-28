@@ -2,7 +2,7 @@ package br.com.meli.partidas.futebol.controller;
 
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.PartidaResponseDTO;
-import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeContraAdversarioResponseDTO;
+import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeContraOutroResponseDTO;
 import br.com.meli.partidas.futebol.entity.Partida;
 import br.com.meli.partidas.futebol.service.PartidaService;
 import br.com.meli.partidas.futebol.utils.Conversao;
@@ -68,9 +68,9 @@ public class PartidaController {
 
     @GetMapping("/retrospecto")
     @ResponseStatus(HttpStatus.OK)
-    public RetrospectoDoClubeContraAdversarioResponseDTO buscarRetrospectoDoClubeContraAdversario(
-            @RequestParam Long idClube,
-            @RequestParam Long idAdversario) {
-        return partidaService.buscarRetrospectoDoClubeContraAdversario(idClube, idAdversario);
+    public RetrospectoDoClubeContraOutroResponseDTO buscarRetrospectoDoClubeContraOutro(
+            @RequestParam Long idClubeUm,
+            @RequestParam Long idClubeDois) {
+        return partidaService.buscarRetrospectoDoClubeContraOutro(idClubeUm, idClubeDois);
     }
 }
