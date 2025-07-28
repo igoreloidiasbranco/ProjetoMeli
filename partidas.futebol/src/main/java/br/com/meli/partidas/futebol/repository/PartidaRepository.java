@@ -1,10 +1,12 @@
 package br.com.meli.partidas.futebol.repository;
 
+import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Partida;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import java.util.List;
 
 public interface PartidaRepository extends JpaRepository<Partida, Long> {
 
@@ -24,5 +26,7 @@ public interface PartidaRepository extends JpaRepository<Partida, Long> {
             nativeQuery = true)
     Page<Partida> listarPartidasPorEstadio(String nomeEstadio, Pageable paginacao);
 
+
+    List<Partida> findByIdClubeMandanteAndIdClubeVisitante(Clube clubeUm, Clube clubeDois);
 
 }
