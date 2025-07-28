@@ -1,6 +1,7 @@
 package br.com.meli.partidas.futebol.controller;
 
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
+import br.com.meli.partidas.futebol.dto.response.ConfrontoDiretoResponseDTO;
 import br.com.meli.partidas.futebol.dto.response.PartidaResponseDTO;
 import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeContraOutroResponseDTO;
 import br.com.meli.partidas.futebol.entity.Partida;
@@ -73,4 +74,14 @@ public class PartidaController {
             @RequestParam Long idClubeDois) {
         return partidaService.buscarRetrospectoDoClubeContraOutro(idClubeUm, idClubeDois);
     }
+
+    @GetMapping("/confronto_direto")
+    @ResponseStatus(HttpStatus.OK)
+    public ConfrontoDiretoResponseDTO buscarConfrontosDiretos(
+            @RequestParam Long idClubeUm,
+            @RequestParam Long idClubeDois) {
+
+        return partidaService.buscarConfrontoDireto(idClubeUm, idClubeDois);
+    }
 }
+
