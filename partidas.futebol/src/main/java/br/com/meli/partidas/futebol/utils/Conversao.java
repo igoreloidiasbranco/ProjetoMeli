@@ -11,6 +11,7 @@ import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.entity.Partida;
 import org.springframework.beans.BeanUtils;
+import java.util.List;
 
 public class Conversao {
 
@@ -82,5 +83,11 @@ public class Conversao {
         retrospecto.setGolsMarcados(clube.getGolsMarcados());
         retrospecto.setGolsSofridos(clube.getGolsSofridos());
         return retrospecto;
+    }
+
+    public static List<PartidaResponseDTO> entityListToDTOList(List<Partida> partidas) {
+        return partidas.stream()
+                .map(Conversao::entityToDTO)
+                .toList();
     }
 }
