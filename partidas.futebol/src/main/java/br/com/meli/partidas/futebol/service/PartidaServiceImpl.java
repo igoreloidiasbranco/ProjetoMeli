@@ -134,6 +134,7 @@ public class PartidaServiceImpl implements PartidaService {
         }
     }
 
+    @Override
     public void isClubesDiferentes(Long idClube, Long idAdversario) {
         if (idClube.equals(idAdversario)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -226,6 +227,7 @@ public class PartidaServiceImpl implements PartidaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estádio não encontrado"));
     }
 
+    @Override
     public Clube buscarClube(Long idClube) {
         return clubeRepository.findById(idClube)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clube não encontrado"));
@@ -259,7 +261,7 @@ public class PartidaServiceImpl implements PartidaService {
         clubeService.calcularEstatisticas(clubeVisitanteAntigo);
     }
 
-
+    @Override
     public List<Partida> buscarPartidasEntreClubes(Clube clubeUm, Clube clubeDois) {
         return partidaRepository.findByIdClubeMandanteAndIdClubeVisitante(clubeUm, clubeDois);
     }
@@ -289,6 +291,7 @@ public class PartidaServiceImpl implements PartidaService {
                 .setGolsSofridos(retrospectoComoMandante.getGolsSofridos() + retrospectoComoVisitante.getGolsMarcados());
     }
 
+    @Override
     public RetrospectoDoClubeContraOutroResponseDTO calcularRetrospectoClubeContraOutro(List<Partida> partidas) {
         RetrospectoDoClubeContraOutroResponseDTO retrospecto = new RetrospectoDoClubeContraOutroResponseDTO();
         int vitorias = 0, empates = 0, derrotas = 0, golsMarcados = 0, golsSofridos = 0;

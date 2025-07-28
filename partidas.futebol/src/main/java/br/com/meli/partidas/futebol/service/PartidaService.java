@@ -22,14 +22,17 @@ public interface PartidaService {
     Page<Partida> listarPartidas(String nomeClube, String nomeEstadio, Pageable paginacao);
     void isClubesExistem(PartidaRequestDTO partidaRequestDTO);
     void isClubesDiferentes(PartidaRequestDTO partidaRequestDTO);
+    void isClubesDiferentes(Long idClube, Long idAdversario);
     void isGolsPositivos(Integer golsMandante, Integer golsVisitante);
     void isDataHoraAntesCriacaoClube(Clube clubeMandante, Clube clubeVisitante, LocalDate dataHoraPartida);
     void isClubesAtivos(Clube clubeMandante, Clube clubeVisitante);
     void isPartidaAposIntervalo(Clube clubeMandante, Clube clubeVisitante, LocalDateTime dataHoraPartida, Long idPartidaAtual);
     Estadio buscarEstadio(Long idEstadio);
+    Clube buscarClube(Long idClube);
     void isEstadioSemPartida(Estadio estadio, LocalDate dataPartida, Long idPartidaAtual);
     void calcularEstatisticasDosClubes(Partida partida);
     void removerPartidaDesatualizadaNosClubes(Partida partidaDesatualizada);
     List<Partida> buscarPartidasEntreClubes(Clube clubeUm, Clube clubeDois);
     RetrospectoDoClubeContraOutroResponseDTO buscarRetrospectoDoClubeContraOutro(Long idClubeUm, Long idClubeDois);
+    RetrospectoDoClubeContraOutroResponseDTO calcularRetrospectoClubeContraOutro(List<Partida> partidas);
 }
