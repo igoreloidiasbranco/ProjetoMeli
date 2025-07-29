@@ -1,5 +1,6 @@
 package br.com.meli.partidas.futebol.service;
 
+import br.com.meli.partidas.futebol.dto.response.RankingResponseDTO;
 import br.com.meli.partidas.futebol.enums.Sigla;
 import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
@@ -124,7 +125,7 @@ public class ClubeServiceImpl implements ClubeService {
 
     @Override
     public void calcularEstatisticas(Clube clube) {
-        int vitorias = 0, empates = 0, derrotas = 0, golsMarcados = 0, golsSofridos = 0, pontos = 0;
+        int vitorias = 0, empates = 0, derrotas = 0, golsMarcados = 0, golsSofridos = 0, pontos = 0, totalPartidas = 0;
 
         for (Partida p : clube.getPartidasMandante()) {
             golsMarcados += p.getGolsMandante();
@@ -158,8 +159,16 @@ public class ClubeServiceImpl implements ClubeService {
                 .setDerrotas(derrotas)
                 .setGolsMarcados(golsMarcados)
                 .setGolsSofridos(golsSofridos)
-                .setPontos(pontos);
+                .setPontos(pontos)
+                .setTotalPartidas(vitorias + empates + derrotas);
 
         clubeRepository.save(clube);
+    }
+
+    @Override
+    public List<RankingResponseDTO> buscarRanking() {
+        List<Clube> rankingClubes = clubeRepository.buscarRanking();
+
+        return Conversao.entityToRankingResponseDTO(rankingClubes);
     }
 }

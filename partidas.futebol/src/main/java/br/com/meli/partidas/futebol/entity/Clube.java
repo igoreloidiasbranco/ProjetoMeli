@@ -35,6 +35,9 @@ public class Clube {
 
     private Integer pontos = 0;
 
+    private Integer totalPartidas = 0;
+
+
     @OneToMany(mappedBy = "idClubeMandante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Partida> partidasMandante;
 
@@ -135,10 +138,21 @@ public class Clube {
         return pontos;
     }
 
+    public Integer getTotalPartidas() {
+        return totalPartidas;
+    }
+
+
     public Clube setPontos(Integer pontos) {
         this.pontos = pontos;
         return this;
     }
+
+    public Clube setTotalPartidas(Integer totalPartidas) {
+        this.totalPartidas = totalPartidas;
+        return this;
+    }
+
 
     public List<Partida> getPartidasMandante() {
         return partidasMandante;

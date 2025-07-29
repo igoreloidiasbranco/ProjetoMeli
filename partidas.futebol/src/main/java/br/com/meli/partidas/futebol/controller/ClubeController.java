@@ -1,5 +1,6 @@
 package br.com.meli.partidas.futebol.controller;
 
+import br.com.meli.partidas.futebol.dto.response.RankingResponseDTO;
 import br.com.meli.partidas.futebol.enums.Sigla;
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 
 @RestController
@@ -74,5 +76,11 @@ public class ClubeController {
     @ResponseStatus(HttpStatus.OK)
     public RetrospectoDoClubeResponseDTO buscarRetrospectoClube(@PathVariable Long id) {
         return clubeService.buscarRetrospectoClube(id);
+    }
+
+    @GetMapping("/ranking")
+    @ResponseStatus(HttpStatus.OK)
+    public List<RankingResponseDTO> buscarRanking() {
+        return clubeService.buscarRanking();
     }
 }

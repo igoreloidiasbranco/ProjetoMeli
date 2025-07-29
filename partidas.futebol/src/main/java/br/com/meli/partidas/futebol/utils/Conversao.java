@@ -3,10 +3,7 @@ package br.com.meli.partidas.futebol.utils;
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
 import br.com.meli.partidas.futebol.dto.request.EstadioRequestDTO;
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;
-import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
-import br.com.meli.partidas.futebol.dto.response.EstadioResponseDTO;
-import br.com.meli.partidas.futebol.dto.response.PartidaResponseDTO;
-import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeResponseDTO;
+import br.com.meli.partidas.futebol.dto.response.*;
 import br.com.meli.partidas.futebol.entity.Clube;
 import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.entity.Partida;
@@ -88,6 +85,20 @@ public class Conversao {
     public static List<PartidaResponseDTO> entityListToDTOList(List<Partida> partidas) {
         return partidas.stream()
                 .map(Conversao::entityToDTO)
+                .toList();
+    }
+
+    public static List<RankingResponseDTO> entityToRankingResponseDTO(List<Clube> clubes) {
+        return clubes.stream()
+                .map(clube -> {
+                    RankingResponseDTO rankingResponseDTO = new RankingResponseDTO();
+                    rankingResponseDTO.setNome(clube.getNome());
+                    rankingResponseDTO.setPontos(clube.getPontos());
+                    rankingResponseDTO.setGolsMarcados(clube.getGolsMarcados());
+                    rankingResponseDTO.setVitorias(clube.getVitorias());
+                    rankingResponseDTO.setTotalPartidas(clube.getTotalPartidas());
+                    return rankingResponseDTO;
+                })
                 .toList();
     }
 }

@@ -1,10 +1,12 @@
 package br.com.meli.partidas.futebol.service;
 
+import br.com.meli.partidas.futebol.dto.response.RankingResponseDTO;
 import br.com.meli.partidas.futebol.enums.Sigla;
 import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 
 public interface ClubeService {
@@ -28,4 +30,6 @@ public interface ClubeService {
     RetrospectoDoClubeResponseDTO buscarRetrospectoClube(Long id);
 
     void calcularEstatisticas(Clube clube);
+
+    List<RankingResponseDTO> buscarRanking();
 }
