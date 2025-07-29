@@ -1,5 +1,6 @@
 package br.com.meli.partidas.futebol.utils;
 
+import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeResponseDTO;
 import br.com.meli.partidas.futebol.enums.Sigla;
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
 import br.com.meli.partidas.futebol.dto.request.EstadioRequestDTO;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 class ConversaoTest {
@@ -146,6 +148,22 @@ class ConversaoTest {
         Assertions.assertEquals(partida.getDataHoraPartida(), resultado.getDataHoraPartida());
     }
 
+    @Test
+    @DisplayName("Dado um Clube válido, deve retornar um RetrospectoDoClubeResponseDTO")
+    void testEntityToRetrospectoDTO() {
+        Clube clube = clubeMandante();
+
+        RetrospectoDoClubeResponseDTO resultado = Conversao.entityToRetrospectoDTO(clube);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(clube.getNome(), resultado.getNomeClube());
+        Assertions.assertEquals(clube.getVitorias(), resultado.getVitorias());
+        Assertions.assertEquals(clube.getEmpates(), resultado.getEmpates());
+        Assertions.assertEquals(clube.getDerrotas(), resultado.getDerrotas());
+        Assertions.assertEquals(clube.getGolsMarcados(), resultado.getGolsMarcados());
+        Assertions.assertEquals(clube.getGolsSofridos(), resultado.getGolsSofridos());
+    }
+
     private Clube clubeMandante() {
         Clube clubeMandante = new Clube();
         clubeMandante.setId(1L);
@@ -153,8 +171,8 @@ class ConversaoTest {
         clubeMandante.setSigla(Sigla.SP);
         clubeMandante.setDataCriacao(LocalDate.now());
         clubeMandante.setAtivo(true);
-        clubeMandante.setPartidasMandante(null);
-        clubeMandante.setPartidasVisitante(null);
+        clubeMandante.setPartidasMandante(List.of());
+        clubeMandante.setPartidasVisitante(List.of());
         return clubeMandante;
     }
 
@@ -165,8 +183,8 @@ class ConversaoTest {
         clubeVisitante.setSigla(Sigla.RJ);
         clubeVisitante.setDataCriacao(LocalDate.now());
         clubeVisitante.setAtivo(true);
-        clubeVisitante.setPartidasMandante(null);
-        clubeVisitante.setPartidasVisitante(null);
+        clubeVisitante.setPartidasMandante(List.of());
+        clubeVisitante.setPartidasVisitante(List.of());
         return clubeVisitante;
     }
 
