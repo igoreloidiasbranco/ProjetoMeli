@@ -1,6 +1,6 @@
 package br.com.meli.partidas.futebol.controller;
 
-import br.com.meli.partidas.futebol.dto.Sigla;
+import br.com.meli.partidas.futebol.enums.Sigla;
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.ClubeResponseDTO;
 import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeResponseDTO;

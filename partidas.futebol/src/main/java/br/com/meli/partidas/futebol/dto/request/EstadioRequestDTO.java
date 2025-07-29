@@ -1,6 +1,6 @@
 package br.com.meli.partidas.futebol.dto.request;
 
-import br.com.meli.partidas.futebol.dto.Sigla;
+import br.com.meli.partidas.futebol.enums.Sigla;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

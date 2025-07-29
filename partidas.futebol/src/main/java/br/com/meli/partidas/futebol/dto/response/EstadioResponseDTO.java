@@ -1,6 +1,6 @@
 package br.com.meli.partidas.futebol.dto.response;
 
-import br.com.meli.partidas.futebol.dto.Sigla;
+import br.com.meli.partidas.futebol.enums.Sigla;
 
 
 public class EstadioResponseDTO {

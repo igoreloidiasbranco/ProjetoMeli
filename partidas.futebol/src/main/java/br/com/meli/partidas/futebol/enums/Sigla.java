@@ -1,4 +1,4 @@
-package br.com.meli.partidas.futebol.dto;
+package br.com.meli.partidas.futebol.enums;
 
 public enum Sigla {
     AC,

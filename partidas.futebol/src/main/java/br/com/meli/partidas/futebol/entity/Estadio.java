@@ -1,6 +1,6 @@
 package br.com.meli.partidas.futebol.entity;
 
-import br.com.meli.partidas.futebol.dto.Sigla;
+import br.com.meli.partidas.futebol.enums.Sigla;
 import jakarta.persistence.*;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package br.com.meli.partidas.futebol.utils;
 
-import br.com.meli.partidas.futebol.dto.Sigla;
+import br.com.meli.partidas.futebol.enums.Sigla;
 import br.com.meli.partidas.futebol.dto.request.ClubeRequestDTO;
 import br.com.meli.partidas.futebol.dto.request.EstadioRequestDTO;
 import br.com.meli.partidas.futebol.dto.request.PartidaRequestDTO;

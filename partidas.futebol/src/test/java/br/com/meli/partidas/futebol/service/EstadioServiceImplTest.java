@@ -1,7 +1,7 @@
 package br.com.meli.partidas.futebol.service;
 
 
-import br.com.meli.partidas.futebol.dto.Sigla;
+import br.com.meli.partidas.futebol.enums.Sigla;
 import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.exception.IdNotFoundException;
 import br.com.meli.partidas.futebol.exception.NomeExistsException;

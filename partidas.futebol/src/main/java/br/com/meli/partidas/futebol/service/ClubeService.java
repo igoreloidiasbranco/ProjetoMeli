@@ -1,6 +1,6 @@
 package br.com.meli.partidas.futebol.service;
 
-import br.com.meli.partidas.futebol.dto.Sigla;
+import br.com.meli.partidas.futebol.enums.Sigla;
 import br.com.meli.partidas.futebol.dto.response.RetrospectoDoClubeResponseDTO;
 import br.com.meli.partidas.futebol.entity.Clube;
 import org.springframework.data.domain.Page;

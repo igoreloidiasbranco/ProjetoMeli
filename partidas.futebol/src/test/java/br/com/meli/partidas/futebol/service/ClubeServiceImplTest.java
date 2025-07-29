@@ -17,8 +17,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import static br.com.meli.partidas.futebol.dto.Sigla.RJ;
-import static br.com.meli.partidas.futebol.dto.Sigla.SP;
+import static br.com.meli.partidas.futebol.enums.Sigla.RJ;
+import static br.com.meli.partidas.futebol.enums.Sigla.SP;
 
 class ClubeServiceImplTest {
 
