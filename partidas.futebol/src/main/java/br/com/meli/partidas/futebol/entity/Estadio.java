@@ -6,7 +6,8 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "estadios")
+@Table(name = "estadios", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"nome"})})
 public class Estadio {
 
     @Id
