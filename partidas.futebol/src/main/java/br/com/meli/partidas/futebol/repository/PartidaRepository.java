@@ -29,4 +29,9 @@ public interface PartidaRepository extends JpaRepository<Partida, Long> {
 
     List<Partida> findByIdClubeMandanteAndIdClubeVisitante(Clube clubeUm, Clube clubeDois);
 
+    @Query(
+            value = "SELECT * FROM partidas " +
+                    "WHERE ABS(gols_mandante - gols_visitante) >= :goleadasComDiferencaGols",
+            nativeQuery = true)
+    Page<Partida> listarPartidasPorGoleadas(Integer goleadasComDiferencaGols, Pageable paginacao);
 }

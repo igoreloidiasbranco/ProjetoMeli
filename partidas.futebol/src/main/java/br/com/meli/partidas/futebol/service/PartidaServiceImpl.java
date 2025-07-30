@@ -92,13 +92,12 @@ public class PartidaServiceImpl implements PartidaService {
     @Override
     public Partida buscarPartidaPorId(Long id) {
 
-        Partida partidaEncontrada = partidaRepository.findById(id)
+        return partidaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Partida não encontrada"));
-        return partidaEncontrada;
     }
 
     @Override
-    public Page<Partida> listarPartidas(String nomeClube, String nomeEstadio, Pageable paginacao) {
+    public Page<Partida> listarPartidas(String nomeClube, String nomeEstadio, Integer goleadasComDiferencaGols, Pageable paginacao) {
 
         if (nomeClube != null && !nomeClube.isEmpty()) {
             return partidaRepository.listarPartidasPorClube(nomeClube, paginacao);
@@ -106,6 +105,13 @@ public class PartidaServiceImpl implements PartidaService {
 
         if (nomeEstadio != null && !nomeEstadio.isEmpty()) {
             return partidaRepository.listarPartidasPorEstadio(nomeEstadio, paginacao);
+        }
+
+        if (goleadasComDiferencaGols != null) {
+            if (goleadasComDiferencaGols < 3) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Goleadas devem ser maiores ou iguais a 3");
+            }
+            return partidaRepository.listarPartidasPorGoleadas(goleadasComDiferencaGols, paginacao);
         }
 
         return partidaRepository.findAll(paginacao);

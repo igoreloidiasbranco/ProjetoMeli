@@ -60,10 +60,11 @@ public class PartidaController {
     public Page<PartidaResponseDTO> listarPartidas(
             @RequestParam(required = false) String nomeClube,
             @RequestParam(required = false) String nomeEstadio,
+            @RequestParam(required = false) Integer goleadasComDiferencaGols,
             @PageableDefault(size = 5, sort = {"id"})
             Pageable paginacao) {
 
-        Page<Partida> partidas = partidaService.listarPartidas(nomeClube, nomeEstadio, paginacao);
+        Page<Partida> partidas = partidaService.listarPartidas(nomeClube, nomeEstadio, goleadasComDiferencaGols, paginacao);
         return partidas.map(Conversao::entityToDTO);
     }
 

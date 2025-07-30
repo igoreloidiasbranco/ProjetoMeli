@@ -20,7 +20,7 @@ public interface PartidaService {
     Partida atualizarPartida(Partida partidaEditada);
     void deletarPartida(Long id);
     Partida buscarPartidaPorId(Long id);
-    Page<Partida> listarPartidas(String nomeClube, String nomeEstadio, Pageable paginacao);
+    Page<Partida> listarPartidas(String nomeClube, String nomeEstadio, Integer goleadasComDiferencaGols, Pageable paginacao);
     void isClubesExistem(PartidaRequestDTO partidaRequestDTO);
     void isClubesDiferentes(PartidaRequestDTO partidaRequestDTO);
     void isClubesDiferentes(Long idClube, Long idAdversario);

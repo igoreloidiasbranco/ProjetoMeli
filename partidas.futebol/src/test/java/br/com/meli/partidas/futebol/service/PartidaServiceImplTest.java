@@ -165,7 +165,7 @@ class PartidaServiceImplTest {
         Page<Partida> partidas = new PageImpl<>(List.of(partidaSalvaNoBanco()));
 
         Mockito.when(partidaRepository.findAll(paginacao)).thenReturn(partidas);
-        Page<Partida> resultado = partidaService.listarPartidas(null, null, paginacao);
+        Page<Partida> resultado = partidaService.listarPartidas(null, null, null, paginacao);
 
         Assertions.assertNotNull(resultado);
         Assertions.assertEquals(partidas, resultado);
@@ -178,7 +178,7 @@ class PartidaServiceImplTest {
         Page<Partida> partidas = new PageImpl<>(List.of(partidaSalvaNoBanco()));
 
         Mockito.when(partidaRepository.listarPartidasPorClube("Clube Um", paginacao)).thenReturn(partidas);
-        Page<Partida> resultado = partidaService.listarPartidas("Clube Um", null, paginacao);
+        Page<Partida> resultado = partidaService.listarPartidas("Clube Um", null, null, paginacao);
 
         Assertions.assertNotNull(resultado);
         Assertions.assertEquals(partidas.getTotalPages(), resultado.getTotalPages());
@@ -194,7 +194,7 @@ class PartidaServiceImplTest {
         Page<Partida> partidas = new PageImpl<>(List.of(partidaSalvaNoBanco()));
 
         Mockito.when(partidaRepository.listarPartidasPorEstadio("Nome do Estádio", paginacao)).thenReturn(partidas);
-        Page<Partida> resultado = partidaService.listarPartidas(null, "Nome do Estádio", paginacao);
+        Page<Partida> resultado = partidaService.listarPartidas(null, "Nome do Estádio", null, paginacao);
 
         Assertions.assertNotNull(resultado);
         Assertions.assertEquals(partidas.getTotalPages(), resultado.getTotalPages());
