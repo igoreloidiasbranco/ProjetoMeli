@@ -34,7 +34,7 @@ public interface PartidaService {
     void calcularEstatisticasDosClubes(Partida partida);
     void removerPartidaDesatualizadaNosClubes(Partida partidaDesatualizada);
     List<Partida> buscarPartidasEntreClubes(Clube clubeUm, Clube clubeDois);
-    RetrospectoDoClubeContraOutroResponseDTO buscarRetrospectoDoClubeContraOutro(Long idClubeUm, Long idClubeDois);
+    RetrospectoDoClubeContraOutroResponseDTO buscarRetrospectoDoClubeContraOutro(Long idClubeUm, Long idClubeDois, Boolean isMandante);
     RetrospectoDoClubeContraOutroResponseDTO calcularRetrospectoClubeContraOutro(List<Partida> partidas);
     ConfrontoDiretoResponseDTO buscarConfrontoDireto(Long idClubeUm, Long idClubeDois);
 }

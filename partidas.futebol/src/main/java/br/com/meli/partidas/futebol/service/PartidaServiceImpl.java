@@ -274,12 +274,20 @@ public class PartidaServiceImpl implements PartidaService {
     }
 
     @Override
-    public RetrospectoDoClubeContraOutroResponseDTO buscarRetrospectoDoClubeContraOutro(Long idClubeUm, Long idClubeDois) {
+    public RetrospectoDoClubeContraOutroResponseDTO buscarRetrospectoDoClubeContraOutro(Long idClubeUm, Long idClubeDois, Boolean isMandante) {
         isClubesDiferentes(idClubeUm, idClubeDois);
         Clube clube = buscarClube(idClubeUm);
         Clube adversario = buscarClube(idClubeDois);
         List<Partida> partidasComoMandante = buscarPartidasEntreClubes(clube, adversario);
         List<Partida> partidasComoVisitante = buscarPartidasEntreClubes(adversario, clube);
+
+        if (isMandante != null) {
+            if (isMandante) {
+                partidasComoVisitante.clear();
+            } else {
+                partidasComoMandante.clear();
+            }
+        }
 
         if (partidasComoMandante.isEmpty() && partidasComoVisitante.isEmpty()) {
             return Builder.retrospectoDoClubeContraOutroResponseDTOVazio(clube, adversario);
@@ -332,8 +340,8 @@ public class PartidaServiceImpl implements PartidaService {
         confrontosDiretos.addAll(partidaRepository.findByIdClubeMandanteAndIdClubeVisitante(clubeUm, clubeDois));
         confrontosDiretos.addAll(partidaRepository.findByIdClubeMandanteAndIdClubeVisitante(clubeDois, clubeUm));
 
-        RetrospectoDoClubeContraOutroResponseDTO retrospectoUm = buscarRetrospectoDoClubeContraOutro(idClubeUm, idClubeDois);
-        RetrospectoDoClubeContraOutroResponseDTO retrospectoDois = buscarRetrospectoDoClubeContraOutro(idClubeDois, idClubeUm);
+        RetrospectoDoClubeContraOutroResponseDTO retrospectoUm = buscarRetrospectoDoClubeContraOutro(idClubeUm, idClubeDois, null);
+        RetrospectoDoClubeContraOutroResponseDTO retrospectoDois = buscarRetrospectoDoClubeContraOutro(idClubeDois, idClubeUm, null);
 
         return new ConfrontoDiretoResponseDTO().setPartidas(Conversao.entityListToDTOList(confrontosDiretos))
                 .setRetrospectoClubeUm(retrospectoUm)

@@ -72,8 +72,9 @@ public class PartidaController {
     @ResponseStatus(HttpStatus.OK)
     public RetrospectoDoClubeContraOutroResponseDTO buscarRetrospectoDoClubeContraOutro(
             @RequestParam Long idClubeUm,
-            @RequestParam Long idClubeDois) {
-        return partidaService.buscarRetrospectoDoClubeContraOutro(idClubeUm, idClubeDois);
+            @RequestParam Long idClubeDois,
+            @RequestParam(required = false) Boolean isMandante) {
+        return partidaService.buscarRetrospectoDoClubeContraOutro(idClubeUm, idClubeDois, isMandante);
     }
 
     @GetMapping("/confronto_direto")
