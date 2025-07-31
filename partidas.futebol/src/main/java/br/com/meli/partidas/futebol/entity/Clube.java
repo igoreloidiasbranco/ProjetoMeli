@@ -45,6 +45,16 @@ public class Clube {
     @OneToMany(mappedBy = "idClubeVisitante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Partida> partidasVisitante;
 
+    public Clube(Long id, String nome, Sigla sigla, LocalDate dataCriacao, boolean ativo) {
+        this.id = id;
+        this.nome = nome;
+        this.sigla = sigla;
+        this.dataCriacao = dataCriacao;
+        this.ativo = ativo;
+    }
+
+    public Clube() {
+    }
 
     public void inativar() {
         this.ativo = false;
