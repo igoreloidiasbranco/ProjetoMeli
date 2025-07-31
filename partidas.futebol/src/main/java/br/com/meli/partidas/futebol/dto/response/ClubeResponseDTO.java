@@ -17,6 +17,16 @@ public class ClubeResponseDTO {
 
     boolean ativo;
 
+    public ClubeResponseDTO(Long id, String nome, Sigla sigla, LocalDate dataCriacao, boolean ativo) {
+        this.id = id;
+        this.nome = nome;
+        this.sigla = sigla;
+        this.dataCriacao = dataCriacao;
+        this.ativo = ativo;
+    }
+
+    public ClubeResponseDTO() {}
+
     public Long getId() {
         return id;
     }
