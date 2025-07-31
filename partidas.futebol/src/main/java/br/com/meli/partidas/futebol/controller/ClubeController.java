@@ -68,8 +68,7 @@ public class ClubeController {
             @PageableDefault(size = 5, sort = {"nome"}) Pageable paginacao) {
 
         Page<Clube> listaClubes = clubeService.listarClubes(nome, sigla, ativo, paginacao);
-        Page<ClubeResponseDTO> page = listaClubes.map(clube -> Conversao.entityToDTO(clube));
-        return page;
+        return  listaClubes.map(clube -> Conversao.entityToDTO(clube));
     }
 
     @GetMapping("/{id}/retrospecto")
