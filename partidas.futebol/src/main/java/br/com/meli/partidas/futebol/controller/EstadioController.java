@@ -2,6 +2,7 @@ package br.com.meli.partidas.futebol.controller;
 
 import br.com.meli.partidas.futebol.dto.request.EstadioRequestDTO;
 import br.com.meli.partidas.futebol.dto.response.EstadioResponseDTO;
+import br.com.meli.partidas.futebol.dto.response.PartidaResponseDTO;
 import br.com.meli.partidas.futebol.entity.Estadio;
 import br.com.meli.partidas.futebol.service.EstadioService;
 import br.com.meli.partidas.futebol.utils.Conversao;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/estadios")
@@ -57,4 +59,11 @@ public class EstadioController {
                 .map(Conversao::entityToDTO);
     }
 
+    @GetMapping("/{id}/partidas")
+    @ResponseStatus(HttpStatus.OK)
+    public List<PartidaResponseDTO> listarPartidasDoEstadio(
+            @PathVariable Long id
+    ) {
+        return Conversao.entityListToDTOList(estadioService.listarPartidasDoEstadio(id));
+    }
 }

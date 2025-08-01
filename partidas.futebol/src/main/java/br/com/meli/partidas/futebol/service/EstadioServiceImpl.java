@@ -1,12 +1,14 @@
 package br.com.meli.partidas.futebol.service;
 
 import br.com.meli.partidas.futebol.entity.Estadio;
+import br.com.meli.partidas.futebol.entity.Partida;
 import br.com.meli.partidas.futebol.exception.IdNotFoundException;
 import br.com.meli.partidas.futebol.exception.NomeExistsException;
 import br.com.meli.partidas.futebol.repository.EstadioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class EstadioServiceImpl implements EstadioService{
@@ -64,5 +66,11 @@ public class EstadioServiceImpl implements EstadioService{
         if (isNomeEstadioExiste) {
             throw new NomeExistsException("Já existe um estádio com esse nome");
         }
+    }
+
+    @Override
+    public List<Partida> listarPartidasDoEstadio(Long id) {
+        isEstadioExiste(id);
+        return estadioRepository.findPartidasByEstadioId(id);
     }
 }
