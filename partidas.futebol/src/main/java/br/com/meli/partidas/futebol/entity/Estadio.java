@@ -2,7 +2,6 @@ package br.com.meli.partidas.futebol.entity;
 
 import br.com.meli.partidas.futebol.enums.Sigla;
 import jakarta.persistence.*;
-
 import java.util.List;
 
 @Entity
@@ -22,6 +21,15 @@ public class Estadio {
 
     @OneToMany(mappedBy = "idEstadio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Partida> partidas;
+
+    public Estadio(Long id, String nome, Sigla sigla, List<Partida> partidas) {
+        this.id = id;
+        this.nome = nome;
+        this.sigla = sigla;
+        this.partidas = partidas;
+    }
+
+    public Estadio() {}
 
 
     public Long getId() {
