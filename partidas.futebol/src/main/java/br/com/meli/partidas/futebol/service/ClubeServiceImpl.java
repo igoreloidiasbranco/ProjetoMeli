@@ -62,7 +62,8 @@ public class ClubeServiceImpl implements ClubeService {
     @Override
     public Clube buscarClubePorId(Long id) {
         isClubeExiste(id);
-        return clubeRepository.getReferenceById(id);
+        return clubeRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Clube não encontrado"));
     }
 
     @Override

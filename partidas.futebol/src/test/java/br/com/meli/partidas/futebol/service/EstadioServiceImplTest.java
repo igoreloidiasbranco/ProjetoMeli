@@ -14,8 +14,8 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
 import java.util.List;
+import java.util.Optional;
 
 
 class EstadioServiceImplTest {
@@ -77,12 +77,12 @@ class EstadioServiceImplTest {
         Long idExistente = 1L;
 
         Mockito.when(estadioRepository.existsById(idExistente)).thenReturn(true);
-        Mockito.when(estadioRepository.getReferenceById(idExistente)).thenReturn(estadioSalvoNoBanco());
+        Mockito.when(estadioRepository.findById(idExistente)).thenReturn(Optional.of(estadioSalvoNoBanco()));
         Estadio resultado = estadioService.buscarEstadioPorId(idExistente);
 
         Assertions.assertNotNull(resultado);
         Mockito.verify(estadioRepository, Mockito.times(1)).existsById(idExistente);
-        Mockito.verify(estadioRepository, Mockito.times(1)).getReferenceById(idExistente);
+        Mockito.verify(estadioRepository, Mockito.times(1)).findById(idExistente);
         Assertions.assertEquals(idExistente, resultado.getId());
         Assertions.assertEquals(estadioSalvoNoBanco().getNome(), resultado.getNome());
         Assertions.assertEquals(estadioSalvoNoBanco().getSigla(), resultado.getSigla());

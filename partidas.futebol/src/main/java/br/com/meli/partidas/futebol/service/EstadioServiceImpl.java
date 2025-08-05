@@ -7,7 +7,10 @@ import br.com.meli.partidas.futebol.exception.NomeExistsException;
 import br.com.meli.partidas.futebol.repository.EstadioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @Service
@@ -39,7 +42,7 @@ public class EstadioServiceImpl implements EstadioService{
     @Override
     public Estadio buscarEstadioPorId(Long id) {
         isEstadioExiste(id);
-        return estadioRepository.getReferenceById(id);
+        return estadioRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estádio não encontrado"));
     }
 
     @Override

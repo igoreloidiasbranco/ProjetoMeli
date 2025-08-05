@@ -94,7 +94,7 @@ class ClubeServiceImplTest {
         Long idExistente = 1L;
 
         Mockito.when(clubeRepository.existsById(idExistente)).thenReturn(true);
-        Mockito.when(clubeRepository.getReferenceById(idExistente)).thenReturn(clubeSalvoNoBanco());
+        Mockito.when(clubeRepository.findById(idExistente)).thenReturn(Optional.of(clubeSalvoNoBanco()));
 
         Clube resultado = clubeService.buscarClubePorId(idExistente);
 
